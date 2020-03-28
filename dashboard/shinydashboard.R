@@ -2,18 +2,28 @@
 library(shiny)
 library(shinydashboard)
 
-confirmed = read.csv("data/time_series_covid19_confirmed_global.csv")
-deaths = read.csv("data/time_series_covid19_deaths_global.csv")
-recovered = read.csv("data/time_series_covid19_recovered_global.csv")
-italy = read.csv("data/Italy/dpc-covid19-ita-regioni-latest.csv")
-info = read.csv("data/Kaggle_CountryInfo/covid19countryinfo.csv")
-restrictions = read.csv("data/Kaggle_CountryInfo//restrictions.csv")
+
+#
+url_confirmed <- "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/Global_JohnsHopkins/time_series_covid19_confirmed_global.csv?raw=true"
+url_deaths <- "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/Global_JohnsHopkins/time_series_covid19_deaths_global.csv?raw=true"
+url_recovered <- "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/Global_JohnsHopkins/time_series_covid19_recovered_global.csv?raw=true"
+url_italy <- "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/Italy/dpc-covid19-ita-regioni-latest.csv?raw=true"
+#
+
+download.file(url_confirmed, destfile= "./time_series_covid19_confirmed_global.csv", mode = "wb")
+download.file(url_deaths, destfile= "./time_series_covid19_deaths_global.csv", mode = "wb")
+download.file(url_recovered, destfile= "./time_series_covid19_recovered_global.csv", mode = "wb")
+download.file(url_italy, destfile= "./dpc-covid19-ita-regioni-latest.csv", mode = "wb")
+
+confirmed <- read.csv("time_series_covid19_confirmed_global.csv")
+deaths <- read.csv("time_series_covid19_deaths_global.csv")
+recovered <- read.csv("time_series_covid19_recovered_global.csv")
+italy <- read.csv("dpc-covid19-ita-regioni-latest.csv")
 
 #The combination of Country and Province creates UNIQUE values for COUNTRIES SELECTION
 confirmed <- within(confirmed,  Country.Region <- paste(Country.Region, Province.State, sep=" "))
 deaths <- within(deaths,  Country.Region <- paste(Country.Region, Province.State, sep=" "))
 recovered <- within(recovered,  Country.Region <- paste(Country.Region, Province.State, sep=" "))
-
 
 
 
