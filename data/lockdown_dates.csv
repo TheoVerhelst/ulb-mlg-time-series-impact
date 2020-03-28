@@ -1,0 +1,35 @@
+Country.Continent,Country,Country.Region,Date.LockdownBeginning
+Africa,Democratic Republic of the Congo,KINSHASA (DRC),2020-3-28
+Africa,IVORY COAST,,2020-3-23
+Africa,SOUTH AFRICA,,2020-3-27
+Africa,MAROCCO,,2020-3-23
+Africa,ALGERIA,,2020-3-28
+Africa,TUNISIA,,2020-3-22
+Africa,MAURITIUS ISLANDS,,2020-3-24
+Europe,UK,,2020-3-23
+Europe,BULGARIA,,2020-3-19
+Europe,DENMARK,,2020-3-11
+Europe,GREECE,,2020-3-23
+Europe,ITALY,,2020-3-10
+Europe,SPAIN,,2020-3-14
+Europe,CZECH REPUBLIC,,2020-3-16
+Europe,FRANCE,,2020-3-17
+Europe,BELGIUM,,2020-3-18
+Europe,AUSTRIA,,2020-3-16
+Europe,GERMANY,,2020-3-22
+Europe,PORTUGAL,,2020-3-18
+Europe,HUNGARY,,2020-3-27
+Europe,IRELAND,,2020-3-24
+Europe,SWITZERLAND,,2020-3-24
+South America,VENEZUELA,,2020-3-17
+South America,Brazil,SAO PAULO,2020-3-24
+South America,COLOMBIA,,2020-3-24
+South America,ARGENTINA,,2020-3-19
+Asia,INDIA,,2020-3-24
+Asia,China,WUHAN,2020-3-23
+Asia,China,HUBEI PROVINCE,2020-3-13
+Middle East,IRAQ,,2020-3-28
+Middle East,LEBANON,,2020-3-15
+Middle East,ISRAEL,,2020-3-17
+North America,United States of America,CALIFORNIA,2020-3-19
+North America,United States of America,STATE OF NY,2020-3-22
