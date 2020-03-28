@@ -24,4 +24,4 @@ cd $ITALY_GIT_DIR
 echo "[INFO] - Pulling git repository"
 git pull 
 echo "[INFO] - Copying data"
-cp -u dati-regioni/dpc-covid19-ita-regioni-latest.csv $DATA_DIR/Italy
+cp -u dati-regioni/dpc-covid19-ita-regioni.csv $DATA_DIR/Italy
