@@ -1,19 +1,19 @@
 ,Country.Continent,Country.Region,Province.State,Date.Schools,Date.Public Places,Date.Gatherings,Date.Stay at Home,Date.Lockdown,Date.Non-essential,Gatherings.limit,mandatory,notes
 0,,Alabama,Alabama,2020-03-18T00:00:00.000000000,2020-03-20T00:00:00.000000000,,,,,0,"Yes,Yes",","
 1,,Alaska,Alaska,2020-03-16T00:00:00.000000000,2020-03-18T00:00:00.000000000,2020-03-24T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,"
-2,,Argentina,Argentina,,,,2020-03-20T00:00:00.000000000,,,0,Yes,
+2,South America,Argentina,,,,,2020-03-20T00:00:00.000000000,2020-3-19,,0,Yes,
 3,,Arizona,Arizona,2020-03-16T00:00:00.000000000,2020-03-20T00:00:00.000000000,,,,,0,"Yes,Yes",",Only in counties w confirmed cases"
 4,,Arkansas,Arkansas,2020-03-17T00:00:00.000000000,,,,,,0,Yes,
 5,,Atlanta,Atlanta,,2020-03-19T00:00:00.000000000,,,,,0,Yes,
 6,,Australia,Australia,,2020-03-23T00:00:00.000000000,,,,,0,Yes,
 7,Europe,Austria,,,,,2020-03-16T00:00:00.000000000,2020-03-16,,0,Yes,
 8,Europe,Belgium,,,,,2020-03-18T00:00:00.000000000,2020-03-18,,0,Yes,
-9,,California,California,2020-03-12T00:00:00.000000000,2020-03-17T00:00:00.000000000,,2020-03-19T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
+9,North America,US,California,2020-03-12T00:00:00.000000000,2020-03-17T00:00:00.000000000,,2020-03-19T00:00:00.000000000,2020-3-19,,0,"Yes,Yes,Yes",",,"
 10,,Canada,Canada,2020-03-15T00:00:00.000000000,2020-03-20T00:00:00.000000000,,,,,0,"Yes,Yes",",Dates are estimates as they vary by province. Looks like schools are pretty much everywhere and general restrictions 90 percent or more of country"
-11,,China,China,2020-01-26T00:00:00.000000000,2020-01-26T00:00:00.000000000,,,,,0,"Yes,Yes",",Covered most of the country (not 100%)"
-12,,China (Hubei),China (Hubei),,,,,2020-01-24T00:00:00.000000000,,0,Yes,
-13,,China (Wuhan),China (Wuhan),,,,,2020-01-23T00:00:00.000000000,,0,Yes,
-14,,Colombia,Colombia,,,,2020-03-25T00:00:00.000000000,,,0,Yes,
+11,Asia,China,,2020-01-26T00:00:00.000000000,2020-01-26T00:00:00.000000000,,,,,0,"Yes,Yes",",Covered most of the country (not 100%)"
+12,Asia,China,China (Hubei),,,,,2020-01-24T00:00:00.000000000,2020-02-13,0,Yes,"12 cities in Hubei. Shut down all non-essential companies, including manufacturing plants"
+13,Asia,China,China (Wuhan),,,,,2020-01-23T00:00:00.000000000,,0,Yes,"all public transport, including buses, railways, flights, and ferry services would be suspended"
+14,South America,Colombia,,,,,2020-03-25T00:00:00.000000000,2020-3-24,,0,Yes,
 15,,Colorado,Colorado,2020-03-18T00:00:00.000000000,2020-03-01T00:00:00.000000000,2020-03-18T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,"
 16,,Connecticut,Connecticut,2020-03-15T00:00:00.000000000,2020-03-16T00:00:00.000000000,,,,2020-03-20T00:00:00.000000000,0,"Yes,Yes,Yes",",,"
 17,Europe,Czech Republic,,2020-03-13T00:00:00.000000000,2020-03-13T00:00:00.000000000,,2020-03-17T00:00:00.000000000,2020-03-16,,0,"Yes,Yes,Yes","3/18: everyone is required to cover their nose and mouth with some mask or scarf when outside.,,"
@@ -27,12 +27,12 @@
 25,,Hawaii,Hawaii,2020-03-13T00:00:00.000000000,2020-03-17T00:00:00.000000000,,2020-03-25T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
 26,,Idaho,Idaho,2020-03-23T00:00:00.000000000,2020-03-18T00:00:00.000000000,,,,,0,"No,No","Restrictions only partial,"
 27,,Illinois,Illinois,2020-03-13T00:00:00.000000000,2020-03-16T00:00:00.000000000,,2020-03-21T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
-28,,India,India,,,,,2020-03-25T00:00:00.000000000,,0,Yes,
+28,Asia,India,,,,,,2020-3-24,,0,Yes,
 29,,Indiana,Indiana,2020-03-15T00:00:00.000000000,2020-03-16T00:00:00.000000000,,2020-03-23T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
 30,,Iowa,Iowa,2020-03-16T00:00:00.000000000,2020-03-17T00:00:00.000000000,,,,,0,"No,No",","
 31,,Iran,Iran,2020-03-05T00:00:00.000000000,,,2020-03-13T00:00:00.000000000,,,0,"Yes,Yes",",Lockdown pervasiveness/effectiveness not clear"
-32,,Ireland,Ireland,2020-03-13T00:00:00.000000000,,2020-03-13T00:00:00.000000000,,,,100,"Yes,Yes",","
-33,,Israel,Israel,2020-03-12T00:00:00.000000000,2020-03-15T00:00:00.000000000,,2020-03-19T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
+32,Europe,Ireland,,2020-03-13T00:00:00.000000000,,2020-03-13T00:00:00.000000000,,2020-3-24,,100,"Yes,Yes",","
+33,,Israel,Israel,2020-03-12T00:00:00.000000000,2020-03-15T00:00:00.000000000,,2020-03-19T00:00:00.000000000,2020-3-17,,0,"Yes,Yes,Yes",",,"
 34,Europe,Italy,,2020-03-04T00:00:00.000000000,2020-03-09T00:00:00.000000000,,2020-03-19T00:00:00.000000000,2020-03-10,2020-03-11T00:00:00.000000000,0,"Yes,Yes,Yes,Yes",",,,"
 35,,Japan,Japan,2020-03-02T00:00:00.000000000,2020-02-25T00:00:00.000000000,,,,,0,"No,No",","
 36,,Kansas,Kansas,2020-03-17T00:00:00.000000000,,[],,,,60,"Yes,Yes,Yes",",,"
@@ -56,7 +56,7 @@
 54,,New Hampshire,New Hampshire,2020-03-16T00:00:00.000000000,2020-03-16T00:00:00.000000000,[],,,,60,"No,Yes,Yes,Yes",",,,"
 55,,New Jersey,New Jersey,2020-03-18T00:00:00.000000000,2020-03-16T00:00:00.000000000,,2020-03-21T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
 56,,New Mexico,New Mexico,2020-03-16T00:00:00.000000000,2020-03-15T00:00:00.000000000,2020-03-24T00:00:00.000000000,,,2020-03-24T00:00:00.000000000,10,"Yes,Yes,Yes,No","Only partial restrictions (less than 50 percent of seating, tables six feet apart),,,"
-57,,New York,New York,2020-03-16T00:00:00.000000000,2020-03-16T00:00:00.000000000,,2020-03-21T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
+57,North America,US,New York,2020-03-16T00:00:00.000000000,2020-03-16T00:00:00.000000000,,2020-03-21T00:00:00.000000000,2020-3-22,,0,"Yes,Yes,Yes",",,"
 58,,New Zealand,New Zealand,,,,2020-03-23T00:00:00.000000000,,,0,Yes,
 59,,North Carolina,North Carolina,2020-03-16T00:00:00.000000000,2020-03-17T00:00:00.000000000,2020-03-23T00:00:00.000000000,,,,50,"Yes,Yes,Yes",",,"
 60,,North Dakota,North Dakota,2020-03-15T00:00:00.000000000,2020-03-20T00:00:00.000000000,,,,,0,"Yes,Yes",","
@@ -70,7 +70,7 @@
 68,,Poland,Poland,2020-03-12T00:00:00.000000000,2020-03-12T00:00:00.000000000,,,,,500,"Yes,Yes",","
 69,Europe,Portugal,,2020-03-19T00:00:00.000000000,2020-03-19T00:00:00.000000000,,,2020-03-18,,0,"Yes,Yes","Fairlly substantial restrictions,"
 70,,Puerto Rico,Puerto Rico,2020-03-16T00:00:00.000000000,,,2020-03-16T00:00:00.000000000,,,0,"Yes,Yes",","
-71,,Rhode Island,Rhode Island,2020-03-17T00:00:00.000000000,2020-03-17T00:00:00.000000000,[],,,2020-03-23T00:00:00.000000000,35,"Yes,Yes,Yes,No,No",",,,,"
+71,,Rhode Island,Rhode Island,2020-03-17T00:00:00.000000000,2020-03-17T00:00:00.000000000,,,,2020-03-23T00:00:00.000000000,35,"Yes,Yes,Yes,No,No",",,,,"
 72,,Rwanda,Rwanda,,,,2020-03-21T00:00:00.000000000,,,0,Yes,
 73,,San Francisco,San Francisco,,,,2020-03-17T00:00:00.000000000,,,0,Yes,
 74,Africa,South Africa,,,,,2020-03-26T00:00:00.000000000,2020-03-27,,0,Yes,
@@ -78,7 +78,7 @@
 76,,South Dakota,South Dakota,2020-03-13T00:00:00.000000000,,2020-03-24T00:00:00.000000000,,,,10,"Yes,No",","
 77,Europe,Spain,,2020-03-12T00:00:00.000000000,,,2020-03-15T00:00:00.000000000,2020-03-14,,0,"Yes,Yes",","
 78,,Sweden,Sweden,2020-03-17T00:00:00.000000000,,2020-03-11T00:00:00.000000000,,,,500,"Yes,No",","
-79,,Switzerland,Switzerland,2020-03-13T00:00:00.000000000,,2020-03-20T00:00:00.000000000,,,2020-03-16T00:00:00.000000000,5,"Yes,Yes,Yes",",,"
+79,Europe,Switzerland,,2020-03-13T00:00:00.000000000,,2020-03-20T00:00:00.000000000,,2020-3-24,2020-03-16T00:00:00.000000000,5,"Yes,Yes,Yes",",,"
 80,,Taiwan,Taiwan,2020-02-02T00:00:00.000000000,,,,,,0,Yes,
 81,,Tennessee,Tennessee,2020-03-16T00:00:00.000000000,2020-03-23T00:00:00.000000000,2020-03-23T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,"
 82,,Texas,Texas,2020-03-20T00:00:00.000000000,2020-03-20T00:00:00.000000000,2020-03-20T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,"
@@ -103,3 +103,8 @@
 101,Europe,Greece,,,,,,2020-3-23,,0,,
 102,Europe,Italy,Lodi,,,,,2020-02-21,,0,Yes,"covering eleven municipalities of the province of Lodi in Lombardy, and affecting around 50,000 people"
 103,Europe,Italy,Northen Italy,,,,,,2020-03-08,0,Yes,"affecting over sixteen million people, restricting travel from, to or within the affected areas, banning funerals and cultural events, and requiring people to keep at least one metre of distance from one another in public locations such as restaurants, churches and supermarkets"
+104,Europe,Hungary,,,,,,2020-3-27,,0,Yes,
+105,South America,Venezuela,,,,,,2020-3-17,,0,Yes,
+106,South America,Brazil,Sao Paulo,,,,,2020-3-24,,0,Yes,
+107,Middle East,Iraq,,,,,,2020-3-28,,0,Yes,
+108,Middle East,Lebannon,,,,,,2020-3-15,,0,Yes,
