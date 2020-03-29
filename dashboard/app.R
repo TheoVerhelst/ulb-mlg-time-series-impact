@@ -18,8 +18,9 @@ global_data <- readRDS("./COVID19_Global_Italy_wGrowth.Rdata")
 
 
 ##Split between Italian and Global Data##
-italian_data <- global_data[(global_data$Country.Region == "Italy") & (global_data$Province.State!="") ,]
-global_data <- setdiff(global_data,italian_data)
+is_regional_italy <- (global_data$Country.Region == "Italy") & (global_data$Province.State!="")
+italian_data <- global_data[is_regional_italy,]
+global_data <- global_data[!is_regional_italy,]
 
 
 
