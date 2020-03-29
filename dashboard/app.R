@@ -43,7 +43,7 @@ action_label_dict_rev <- names(action_label_dict)
 names(action_label_dict_rev) <- unname(action_label_dict)
 
 
-stat_label_dict <- c("Confirmed cases" = "ConfirmedCases",
+stat_label_dict <- c("Confirmed cases" = "Confirmed",
                     "Deaths" = "Deaths",
                     "Recovered" = "Recovered")
 
@@ -57,6 +57,13 @@ world_side_panel <- sidebarPanel(
   ),
   
   uiOutput("region_selector"),
+  
+  selectInput(
+    inputId = "world_stat",
+    label = "Choose a statistic:",
+    choices = stat_label_dict,
+    selected = stat_label_dict[1]
+  ),
   
   sliderInput(
     "range",
@@ -88,62 +95,42 @@ world_side_panel <- sidebarPanel(
 )
 
 
-world_main_panel <- mainPanel(tabsetPanel(
-  tabPanel("Confirmed",
-           column(
-             width = 12,
-             box(
-               title = "Confirmed",
-               width = NULL,
-               solidHeader = TRUE,
-               status = "primary",
-               plotOutput("confirmed_plot")
-             ),
-             box(
-               title = "Confirmed Growth Rate",
-               width = NULL,
-               solidHeader = TRUE,
-               status = "primary",
-               plotOutput("confirmed_growth_plot")
-             )
-           )),
-  tabPanel("Recovered",
-           column(
-             width = 12,
-             box(
-               title = "Recovered",
-               width = NULL,
-               solidHeader = TRUE,
-               status = "primary",
-               plotOutput("recovered_plot")
-             ),
-             box(
-               title = "Recovered Growth Rate",
-               width = NULL,
-               solidHeader = TRUE,
-               status = "primary",
-               plotOutput("recovered_growth_plot")
-             )
-           )),
-  tabPanel("Death",
-           column(
-             width = 12,
-             box(
-               title = "Deaths",
-               width = NULL,
-               solidHeader = TRUE,
-               status = "primary",
-               plotOutput("deaths_plot")
-             ),
-             box(
-               title = "Deaths Growth Rate",
-               width = NULL,
-               solidHeader = TRUE,
-               status = "primary",
-               plotOutput("deaths_growth_plot")
-             )
-           ))
-))
+world_main_panel <- mainPanel(
+  tabsetPanel(
+    tabPanel("Time evolution",
+       column(
+         width = 12,
+         box(
+           title = "Total cases",
+           width = NULL,
+           solidHeader = TRUE,
+           status = "primary",
+           plotOutput("cases_plot")
+         ),
+         box(
+           title = "Growth Rate",
+           width = NULL,
+           solidHeader = TRUE,
+           status = "primary",
+           plotOutput("growth_plot")
+         )
+       )
+    ),
+    
+    tabPanel("Distribution comparison",
+       column(
+         width = 12,
+         box(
+           title = "Distribution of growth rate before and after action",
+           width = NULL,
+           solidHeader = TRUE,
+           status = "primary",
+           plotOutput("action_comp_plot")
+         )
+       )
+)
+  )
+)
 
 
 italy_side_panel <- sidebarPanel(
@@ -235,6 +222,16 @@ server <- function(input, output) {
                          (global_data$Date <= max_date),])
   })
   
+  # slice exact part of dataset
+  dataset_by_action_input <- reactive({
+    min_date = Sys.Date() + input$range[1]
+    max_date = Sys.Date() + input$range[2]
+    return(global_data_by_action[(global_data_by_action$Country.Region == input$country) &
+                         (global_data_by_action$Province.State == ifelse(input$country %in% countries_with_regions, input$region, "")) &
+                         (global_data_by_action$Date >= min_date) &
+                         (global_data_by_action$Date <= max_date),])
+  })
+  
   get_country_info <- function() {
     return(info_data[(info_data$Country.Region == input$country) &
                          (info_data$Province.State == ifelse(input$country %in% countries_with_regions, input$region, "")),])
@@ -255,18 +252,19 @@ server <- function(input, output) {
   })
   
   
-  make_plot <- function(colname, allow_log) renderPlot({
+  make_plot <- function(colname_suffix, allow_log) renderPlot({
+    stat_to_plot <- paste0(input$world_stat, colname_suffix)
     dataset <- datasetInput()
     country_info <- get_country_info()
     
-    texts_to_show <- as.character(input$dates)
+      texts_to_show <- as.character(input$dates)
     dates_to_show <- do.call("c", lapply(texts_to_show, function(col) country_info[, col]))
     
     # Remove NAs to avoid a warning
     texts_to_show <- texts_to_show[!is.na(dates_to_show)]
     dates_to_show <- dates_to_show[!is.na(dates_to_show)]
     
-    ggplot(as.data.frame(dataset), aes_string(x = "Date", y = colname)) +
+    ggplot(as.data.frame(dataset), aes_string(x = "Date", y = stat_to_plot)) +
       geom_line() +
       geom_vline(xintercept = dates_to_show) +
       annotate("text", x = dates_to_show, y = 0, label = unlist(action_label_dict[texts_to_show])) + 
@@ -278,12 +276,20 @@ server <- function(input, output) {
   ##PLOTS#
   ########
   
-  output$confirmed_plot <- make_plot("Confirmed", allow_log = TRUE)
-  output$recovered_plot <- make_plot("Recovered", allow_log = TRUE)
-  output$deaths_plot <- make_plot("Deaths", allow_log = TRUE)
-  output$confirmed_growth_plot <- make_plot("ConfirmedGrowthRate", allow_log = FALSE)
-  output$recovered_growth_plot <- make_plot("RecoveredGrowthRate", allow_log = FALSE)
-  output$deaths_growth_plot <- make_plot("DeathsGrowthRate", allow_log = FALSE)
+  output$cases_plot <- make_plot("", allow_log = TRUE)
+  output$growth_plot <- make_plot("GrowthRate", allow_log = FALSE)
+  
+  
+  output$action_comp_plot <- renderPlot({
+    dataset <- dataset_by_action_input()
+    dataset <- dataset[dataset$Action == as.character(input$dates),]
+    stat_to_plot <- paste0(input$world_stat, "GrowthRate")
+    
+    ggplot(dataset, aes_string(x = "BeforeAction", color = "BeforeAction", y = stat_to_plot)) + 
+      geom_boxplot() +
+      scale_color_brewer(type = "qual", palette = 2) +
+      theme_bw()
+  })
   
   #########
   ##ITALY##

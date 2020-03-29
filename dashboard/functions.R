@@ -6,9 +6,12 @@ to_long_format_on_action <- function(counts.df, country.df) {
   actions <- c("Date.Schools", "Date.Public Places", "Date.Gatherings", "Date.Stay at Home", "Date.Lockdown", "Date.Non-essential")
   res.df <- do.call("rbind", lapply(unique(counts.df$Country.Region), function(country) {
     do.call("rbind", lapply(actions, function(action) {
-      action_date <- country.df[country.df$Country.Region == country, action]
+      action_date <- country.df[country.df$Country.Region == country &
+                                country.df$Province.State == "", action]
       # If we have no date for the given action in this country
       if (length(action_date) != 1)
+        return(NULL)
+      if (is.na(action_date))
         return(NULL)
       country_counts.df <- counts.df[counts.df$Country.Region == country,]
       country_counts.df$BeforeAction <- country_counts.df$Date <= action_date
