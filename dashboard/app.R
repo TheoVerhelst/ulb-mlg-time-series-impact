@@ -4,61 +4,36 @@ library(shiny)
 library(shinydashboard)
 
 
-##Download and Update Data##
-url_data_info <-
-  "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/COVID19_Country_Info.Rdata?raw=true"
-url_data_global <-
-  "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/COVID19_Global_Italy.Rdata?raw=true"
-url_data_global_wgrowth <-
-  "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/COVID19_Global_Italy_wGrowth.Rdata?raw=true"
-download.file(url_data_global, destfile = "./COVID19_Global_Italy.Rdata", mode = "wb")
-download.file(url_data_info, destfile = "./COVID19_Country_Info.Rdata", mode = "wb")
-download.file(url_data_global_wgrowth,
-              destfile = "./COVID19_Global_Italy_wGrowth.Rdata",
-              mode = "wb")
-
-info_data <- readRDS("./COVID19_Country_Info.Rdata")
-global_data <- readRDS("./COVID19_Global_Italy_wGrowth.Rdata")
-
+##Download Data##
+info_data <- readRDS(url(
+  "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/COVID19_Country_Info.Rdata?raw=true"))
+global_data <- readRDS(url(
+  "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/COVID19_Global_Italy_wGrowth.Rdata?raw=true"))
 
 
 ##Split between Italian and Global Data##
-
-is_regional_italy <- (global_data$Country.Region == "Italy") & (global_data$Province.State!="")
-italian_data <- global_data[is_regional_italy,]
-global_data <- global_data[!is_regional_italy,]
-
+is_regional_italy <- (global_data$Country.Region == "Italy") & (global_data$Province.State != "")
+italian_data <- global_data[is_regional_italy, ]
+global_data <- global_data[!is_regional_italy, ]
 
 
 
 ##Make lists for input panels##
 countries <- unique(global_data["Country.Region"])
-countries_with_regions <-
-  unique(global_data[global_data$Province.State != "", "Country.Region"])
+countries_with_regions <- unique(global_data[global_data$Province.State != "", "Country.Region"])
 statistics_italy <- names(global_data)[6:15]
 statistics_global <- names(global_data)[6:8]
 italian_regions <- unique(italian_data["Province.State"])
-
-compute_logscale <- function(input) {
-  if (input) {
-    logscale <- "y"
-  } else {
-    logscale <- ""
-  }
-  return(logscale)
-}
 
 world_side_panel <- sidebarPanel(
   selectInput(
     inputId = "country",
     label = "Choose a country:",
-    selected = countries[83, ],
+    selected = countries[83,],
     choices = countries
   ),
   
-  
   uiOutput("region_selector"),
-  
   
   sliderInput(
     "range",
@@ -70,11 +45,27 @@ world_side_panel <- sidebarPanel(
   
   checkboxInput("log_scale_world", "Use log scale for Y", FALSE),
   
-  checkboxGroupInput("show_dates_world", "Visualize dates:",
-                     choiceValues =
-                       list("School_closure", "Public_places_closure", "Gatherings_ban", "Stay-at-home", "Lockdown", "Non-essentials_ban"),
-                     choiceNames =
-                       list("School closure", "Public places closure", "Gatherings ban", "Stay-at-home", "Lockdown", "Non-essentials ban")
+  checkboxGroupInput(
+    "show_dates_world",
+    "Visualize dates:",
+    choiceValues =
+      list(
+        "School_closure",
+        "Public_places_closure",
+        "Gatherings_ban",
+        "Stay-at-home",
+        "Lockdown",
+        "Non-essentials_ban"
+      ),
+    choiceNames =
+      list(
+        "School closure",
+        "Public places closure",
+        "Gatherings ban",
+        "Stay-at-home",
+        "Lockdown",
+        "Non-essentials ban"
+      )
   ),
   
   sliderInput(
@@ -225,12 +216,13 @@ server <- function(input, output) {
       #we assume Region names are unique
       return(global_data[(global_data$Province.State == input$region) &
                            (global_data$Date >= min_date) &
-                           (global_data$Date <= max_date),])
+                           (global_data$Date <= max_date), ])
       
     } else {
       return(global_data[(global_data$Country.Region == input$country) &
                            (global_data$Province.State == "") &
-                           (global_data$Date >= min_date) & (global_data$Date <= max_date),])
+                           (global_data$Date >= min_date) &
+                           (global_data$Date <= max_date), ])
       
     }
     
@@ -256,7 +248,6 @@ server <- function(input, output) {
   ########
   
   output$confirmed_plot <- renderPlot({
-    logscale <- compute_logscale(input$log_scale_world)
     dataset <- datasetInput()
     plot(
       x = dataset[, "Date"] ,
@@ -264,13 +255,12 @@ server <- function(input, output) {
       type = "l",
       xlab = "Day",
       ylab = "Confirmed",
-      log = logscale
+      log = ifelse(input$log_scale_world, "y", "")
     )
     # abline(v = as.Date("2020/03/20"))
   })
   
   output$recovered_plot <- renderPlot({
-    logscale <- compute_logscale(input$log_scale_world)
     dataset <- datasetInput()
     plot(
       x = dataset[, "Date"] ,
@@ -278,13 +268,12 @@ server <- function(input, output) {
       type = "l",
       xlab = "Day",
       ylab = "Recovered",
-      log = logscale
+      log = ifelse(input$log_scale_world, "y", "")
     )
     
   })
   
   output$deaths_plot <- renderPlot({
-    logscale <- compute_logscale(input$log_scale_world)
     dataset <- datasetInput()
     plot(
       x = dataset[, "Date"] ,
@@ -292,7 +281,7 @@ server <- function(input, output) {
       type = "l",
       xlab = "Day",
       ylab = "Deaths",
-      log = logscale
+      log = ifelse(input$log_scale_world, "y", "")
     )
     
   })
@@ -339,14 +328,13 @@ server <- function(input, output) {
   #########
   
   output$chosen_stat_it_plot <- renderPlot({
-    logscale <- compute_logscale(input$log_scale_world_IT)
     min_it <- Sys.Date() + input$italy_range[1]
     max_it <- Sys.Date() + input$italy_range[2]
     
     dataset <-
       italian_data[(italian_data$Province.State == input$italy_region) &
                      (italian_data$Date >= min_it) &
-                     (italian_data$Date <= max_it),]
+                     (italian_data$Date <= max_it), ]
     
     plot(
       x = dataset[, "Date"] ,
@@ -354,17 +342,10 @@ server <- function(input, output) {
       type = "l",
       xlab = "Day",
       ylab = input$italy_statistic,
-      log = logscale
+      log = ifelse(input$log_scale_world_IT, "y", "")
     )
-    
   })
-  
-  
-  
-  
 }
 
 
-
 shinyApp(ui, server)
-
