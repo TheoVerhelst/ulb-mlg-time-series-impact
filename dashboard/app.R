@@ -3,6 +3,8 @@ library(dplyr)
 library(shiny)
 library(shinydashboard)
 library(ggplot2)
+library(collections)
+
 
 ##Download Data##
 info_data <- readRDS(url(
@@ -22,6 +24,17 @@ countries_with_regions <- unique(global_data[global_data$Province.State != "", "
 statistics_italy <- names(global_data)[6:15]
 statistics_global <- names(global_data)[6:8]
 italian_regions <- unique(italian_data["Province.State"])
+
+
+
+
+label_dict <- Dict(list("Date.Schools" = "Schools closure",
+                        "Date.Public Places" = "Public places shut down",
+                        "Date.Gatherings" = "Gatherings ban",
+                        "Date.Stay at Home" = "Confinement start",
+                        "Date.Non-essential" = "Non-essential activities ban")
+)
+
 
 world_side_panel <- sidebarPanel(
   selectInput(
@@ -43,26 +56,12 @@ world_side_panel <- sidebarPanel(
   
   checkboxInput("log_scale_world", "Use log scale for Y", FALSE),
   
-  checkboxGroupInput(
-    "show_dates_world",
-    "Visualize dates:",
-    choiceValues =
-      list(
-        "Date.Schools",
-        "Date.Public Places",
-        "Date.Gatherings",
-        "Date.Stay at Home",
-        "Date.Non-essential"
-      ),
-    choiceNames =
-      list(
-        "School closure",
-        "Public places closure",
-        "Gatherings ban",
-        "Stay-at-home",
-        "Non-essentials ban"
-      )
-  ),
+  radioButtons("dates", "Show a special date:",
+               c("School closure" = "Date.Schools",
+                 "Public places shut down" = "Date.Public Places",
+                 "Gatherings ban" = "Date.Gatherings",
+                 "Confinement start" = "Date.Stay at Home",
+                 "Non-essential activities ban" = "Date.Non-essential")),
   
   sliderInput(
     "smooth_growth_rate_world",
@@ -234,7 +233,7 @@ server <- function(input, output) {
     dataset <- datasetInput()
     country_info <- get_country_info()
     
-    texts_to_show <- as.character(input$show_dates_world)
+    texts_to_show <- as.character(input$dates)
     dates_to_show <- do.call("c", lapply(texts_to_show, function(col) country_info[, col]))
     
     # Remove NAs to avoid a warning
@@ -244,7 +243,8 @@ server <- function(input, output) {
     ggplot(as.data.frame(dataset), aes_string(x = "Date", y = colname)) +
       geom_line() +
       geom_vline(xintercept = dates_to_show) +
-      annotate("text", x = dates_to_show, y = 35, label = texts_to_show) + 
+      annotate("text", x = dates_to_show, y = 35, label = label_dict$get(texts_to_show)) + 
+      scale_y_continuous(trans=ifelse(input$log_scale_world & allow_log, "log10", "identity"))+
       theme_bw() 
   })
   
@@ -285,3 +285,4 @@ server <- function(input, output) {
 
 
 shinyApp(ui, server)
+
