@@ -2,7 +2,7 @@
 library(dplyr)
 library(shiny)
 library(shinydashboard)
-
+library(ggplot2)
 
 ##Download Data##
 info_data <- readRDS(url(
@@ -10,12 +10,10 @@ info_data <- readRDS(url(
 global_data <- readRDS(url(
   "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/COVID19_Global_Italy_wGrowth.Rdata?raw=true"))
 
-
 ##Split between Italian and Global Data##
 is_regional_italy <- (global_data$Country.Region == "Italy") & (global_data$Province.State != "")
 italian_data <- global_data[is_regional_italy, ]
 global_data <- global_data[!is_regional_italy, ]
-
 
 
 ##Make lists for input panels##
@@ -50,12 +48,11 @@ world_side_panel <- sidebarPanel(
     "Visualize dates:",
     choiceValues =
       list(
-        "School_closure",
-        "Public_places_closure",
-        "Gatherings_ban",
-        "Stay-at-home",
-        "Lockdown",
-        "Non-essentials_ban"
+        "Date.Schools",
+        "Date.Public Places",
+        "Date.Gatherings",
+        "Date.Stay at Home",
+        "Date.Non-essential"
       ),
     choiceNames =
       list(
@@ -63,7 +60,6 @@ world_side_panel <- sidebarPanel(
         "Public places closure",
         "Gatherings ban",
         "Stay-at-home",
-        "Lockdown",
         "Non-essentials ban"
       )
   ),
@@ -208,36 +204,16 @@ server <- function(input, output) {
   datasetInput <- reactive({
     min_date = Sys.Date() + input$range[1]
     max_date = Sys.Date() + input$range[2]
-    
-    
-    if (!is.null(input$region)) {
-      # we assume Region names are unique
-      return(global_data[(global_data$Province.State == input$region) &
-                           (global_data$Date >= min_date) &
-                           (global_data$Date <= max_date), ])
-      
-    } else {
-      return(global_data[(global_data$Country.Region == input$country) &
-                           (global_data$Province.State == "") &
-                           (global_data$Date >= min_date) &
-                           (global_data$Date <= max_date), ])
-      
-    }
+    return(global_data[(global_data$Country.Region == input$country) &
+                         (global_data$Province.State == ifelse(input$country %in% countries_with_regions, input$region, "")) &
+                         (global_data$Date >= min_date) &
+                         (global_data$Date <= max_date),])
   })
   
-  
-  make_plot <- function(colname, allow_log) renderPlot({
-    dataset <- datasetInput()
-    plot(
-      x = dataset[, "Date"] ,
-      y = dataset[, colname],
-      type = "l",
-      xlab = "Day",
-      ylab = colname,
-      log = ifelse(input$log_scale_world & allow_log, "y", "")
-    )
-    # abline(v = as.Date("2020/03/20"))
-  })
+  get_country_info <- function() {
+    return(info_data[(info_data$Country.Region == input$country) &
+                         (info_data$Province.State == ifelse(input$country %in% countries_with_regions, input$region, "")),])
+  }
   
   ## Render the region selector if a country with regions is chosen
   output$region_selector <- renderUI({
@@ -253,6 +229,24 @@ server <- function(input, output) {
     
   })
   
+  
+  make_plot <- function(colname, allow_log) renderPlot({
+    dataset <- datasetInput()
+    country_info <- get_country_info()
+    
+    texts_to_show <- as.character(input$show_dates_world)
+    dates_to_show <- do.call("c", lapply(texts_to_show, function(col) country_info[, col]))
+    
+    # Remove NAs to avoid a warning
+    texts_to_show <- texts_to_show[!is.na(dates_to_show)]
+    dates_to_show <- dates_to_show[!is.na(dates_to_show)]
+    
+    ggplot(as.data.frame(dataset), aes_string(x = "Date", y = colname)) +
+      geom_line() +
+      geom_vline(xintercept = dates_to_show) +
+      annotate("text", x = dates_to_show, y = 35, label = texts_to_show) + 
+      theme_bw() 
+  })
   
   ########
   ##PLOTS#
