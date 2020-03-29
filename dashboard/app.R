@@ -68,7 +68,7 @@ world_side_panel <- sidebarPanel(
   sliderInput(
     "range",
     label = "Days of interest (0 = last day):",
-    min = -60,
+    min = -90,
     max = 0,
     value = c(-30, 0)
   ),
@@ -267,7 +267,9 @@ server <- function(input, output) {
     ggplot(as.data.frame(dataset), aes_string(x = "Date", y = stat_to_plot)) +
       geom_line() +
       geom_vline(xintercept = dates_to_show) +
-      annotate("text", x = dates_to_show, y = 0, label = unlist(action_label_dict[texts_to_show])) + 
+      xlab("Date") +
+      ylab(stat_to_plot) +
+      annotate("text", x = dates_to_show, y = 0, angle = 90, vjust = 1.5, hjust=-1.5, label = unlist(action_label_dict[texts_to_show])) + 
       scale_y_continuous(trans=ifelse(input$log_scale_world & allow_log, "log10", "identity")) +
       theme_bw() 
   })
@@ -304,14 +306,12 @@ server <- function(input, output) {
                      (italian_data$Date >= min_it) &
                      (italian_data$Date <= max_it), ]
     
-    plot(
-      x = dataset[, "Date"] ,
-      y = dataset[, input$italy_statistic],
-      type = "l",
-      xlab = "Day",
-      ylab = input$italy_statistic,
-      log = ifelse(input$log_scale_world_IT, "y", "")
-    )
+    ggplot(dataset, aes_string(x = "Date", y = input$italy_statistic)) +
+      geom_line() +
+      xlab("Date") +
+      ylab(input$italy_statistic) +
+      scale_y_continuous(trans=ifelse(input$log_scale_world_IT, "log10", "identity")) +
+      theme_bw()
   })
   
   output$ranking_plot <- renderPlot({
