@@ -30,11 +30,19 @@ statistics_italy <- names(global_data)[6:15]
 statistics_global <- names(global_data)[6:8]
 italian_regions <- unique(italian_data["Province.State"])
 
+compute_logscale <- function(input){
+  if (input){
+    logscale <- "y"
+  } else {
+    logscale <- ""
+  }
+  return(logscale)
+} 
 
 world_side_panel <- sidebarPanel( 
   selectInput(inputId = "country",
               label = "Choose a country:",
-              selected = countries[0],
+              selected = countries[83,],
               choices = countries), 
   
   
@@ -43,14 +51,26 @@ world_side_panel <- sidebarPanel(
   
   sliderInput("range", 
               label = "Days of interest (0 = last day):",
-              min = -60, max = 0, value = c(-7, 0))
+              min = -60, max = 0, value = c(-14, 0)),
+  
+  checkboxInput("log_scale_world", "Use log scale for Y", FALSE),
+  
+  checkboxInput("show_dates_world", "Show important dates (WORK IN PROGRESS)", FALSE),
+  
+  sliderInput("smooth_growth_rate_world", 
+              label = "Degree of growth-rate smoothing: (WORK IN PROGRESS)",
+              min = 0, max = 10, value = 0),
+  
+  sliderInput("day_split_world", 
+              label = "Day analyzed (0 = last day): (WORK IN PROGRESS)",
+              min = 0, max = 10, value = 0)
 )
 
 
 world_main_panel <- mainPanel(
   tabsetPanel(
-    tabPanel("Recovered", 
-             column(width = 10,
+    tabPanel("Confirmed", 
+             column(width = 12,
                     box(
                       title = "Confirmed", width = NULL, solidHeader = TRUE, status = "primary",
                       plotOutput("confirmed_plot")
@@ -62,7 +82,7 @@ world_main_panel <- mainPanel(
              )         
     ),
     tabPanel("Recovered", 
-             column(width = 10,
+             column(width = 12,
                     box(
                       title = "Recovered", width = NULL,solidHeader = TRUE, status = "primary",
                       plotOutput("recovered_plot")
@@ -74,7 +94,7 @@ world_main_panel <- mainPanel(
              )         
     ),
     tabPanel("Death",
-             column(width = 10,
+             column(width = 12,
                     box(
                       title = "Deaths", width = NULL, solidHeader = TRUE,status = "primary",
                       plotOutput("deaths_plot")
@@ -102,7 +122,8 @@ italy_side_panel <- sidebarPanel(
   
   sliderInput(inputId = "italy_range", 
               label = "Days of interest (0 = last day):",
-              min = -60, max = 0, value = c(-7, 0))
+              min = -60, max = 0, value = c(-7, 0)),
+  checkboxInput("log_scale_world_IT", "Use log scale for Y", FALSE)
 )
 
 
@@ -130,17 +151,19 @@ ui <- dashboardPage(
         
   ## Body content
   dashboardBody(
-    tabItems(
-      # First tab content
-      tabItem(tabName = "world",
-              world_side_panel,
-              world_main_panel),
-      tabItem(tabName = "italy",
-              italy_side_panel,
-              italy_main_panel
-              )
+      fluidPage(
+        tabItems(
+          # First tab content
+          tabItem(tabName = "world",
+                  world_side_panel,
+                  world_main_panel),
+          tabItem(tabName = "italy",
+                  italy_side_panel,
+                  italy_main_panel
+                  )
+          )
+        )
       )
-    )
   )
 
 
@@ -186,54 +209,70 @@ server <- function(input, output) {
   ########
   
   output$confirmed_plot <- renderPlot({
+    logscale <- compute_logscale(input$log_scale_world)
     dataset <- datasetInput()
     plot(x = dataset[,"Date"] , 
          y = dataset[,"Confirmed"],
+         type="l",
          xlab = "Day",
-         ylab = "Confirmed")
-    abline(v = as.Date("2020/03/20"))
+         ylab = "Confirmed",
+         log = logscale)
+    #abline(v = as.Date("2020/03/20"))
   })
   
   output$recovered_plot <- renderPlot({
+    logscale <- compute_logscale(input$log_scale_world)
     dataset <- datasetInput()
     plot(x = dataset[,"Date"] , 
          y = dataset[,"Recovered"],
+         type="l",
          xlab = "Day",
-         ylab = "Recovered")
+         ylab = "Recovered",
+         log = logscale)
     
   })
   
   output$deaths_plot <- renderPlot({
+    logscale <- compute_logscale(input$log_scale_world)
     dataset <- datasetInput()
     plot(x = dataset[,"Date"] , 
          y = dataset[,"Deaths"],
+         type="l",
          xlab = "Day",
-         ylab = "Deaths")
+         ylab = "Deaths",
+         log = logscale)
     
   })
   
   output$confirmed_growth_plot <- renderPlot({
+    
     dataset <- datasetInput()
     plot(x = dataset[,"Date"] , 
          y = dataset[,"ConfirmedGrowthRate"],
+         type="l",
          xlab = "Day",
-         ylab = "Confirmed Growth Rate")
+         ylab = "Confirmed Growth Rate"
+         )
     
   })
   
   output$recovered_growth_plot <- renderPlot({
+    
     dataset <- datasetInput()
     plot(x = dataset[,"Date"] , 
          y = dataset[,"RecoveredGrowthRate"],
+         type="l",
          xlab = "Day",
          ylab = "Recovered Growth Rate")
     
   })
   
   output$deaths_growth_plot <- renderPlot({
+    
     dataset <- datasetInput()
     plot(x = dataset[,"Date"] , 
          y = dataset[,"DeathsGrowthRate"],
+         type="l",
          xlab = "Day",
          ylab = "Deaths Growth Rate")
     
@@ -245,20 +284,20 @@ server <- function(input, output) {
   #########
   
   output$chosen_stat_it_plot <- renderPlot({
+    logscale <- compute_logscale(input$log_scale_world_IT)
     min_it <- Sys.Date()+input$italy_range[1]
     max_it <- Sys.Date()+input$italy_range[2]
-    print(min_it)
-    print(max_it)
-    print(input$italy_region)
-    print(italian_data)
+    
     dataset <- italian_data[(italian_data$Province.State == input$italy_region) & 
                             (italian_data$Date >= min_it) & 
                             (italian_data$Date <= max_it), ]
-    print(dataset)
+    
     plot(x = dataset[,"Date"] , 
          y = dataset[,input$italy_statistic],
+         type="l",
          xlab = "Day",
-         ylab = input$italy_statistic)
+         ylab = input$italy_statistic,
+         log = logscale) 
     
   })
   
