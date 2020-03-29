@@ -234,14 +234,17 @@ server <- function(input, output) {
     dataset <- datasetInput()
     country_info <- get_country_info()
     
-    for (col in as.character(input$show_dates_world))
-      dates_to_show <- c(dates_to_show, country_info[, col])
-    
     texts_to_show <- as.character(input$show_dates_world)
+    dates_to_show <- do.call("c", lapply(texts_to_show, function(col) country_info[, col]))
+    
+    # Remove NAs to avoid a warning
+    texts_to_show <- texts_to_show[!is.na(dates_to_show)]
+    dates_to_show <- dates_to_show[!is.na(dates_to_show)]
+    
     ggplot(as.data.frame(dataset), aes_string(x = "Date", y = colname)) +
       geom_line() +
-      #geom_vline(xintercept = dates_to_show) +
-      annotate("text", x = as.Date(c( "2020-03-18", "2020-03-23")), y = 35, label = c("Event1", "Event2")) + 
+      geom_vline(xintercept = dates_to_show) +
+      annotate("text", x = dates_to_show, y = 35, label = texts_to_show) + 
       theme_bw() 
   })
   
