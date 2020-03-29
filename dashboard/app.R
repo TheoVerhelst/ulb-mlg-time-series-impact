@@ -5,6 +5,8 @@ library(shinydashboard)
 library(ggplot2)
 library(collections)
 
+source("functions.R")
+
 
 ##Download Data##
 info_data <- readRDS(url(
@@ -17,6 +19,8 @@ is_regional_italy <- (global_data$Country.Region == "Italy") & (global_data$Prov
 italian_data <- global_data[is_regional_italy, ]
 global_data <- global_data[!is_regional_italy, ]
 
+global_data_by_action <- to_long_format_on_action(global_data, info_data)
+global_data_by_action <- global_data_by_action[is.finite(global_data_by_action$ConfirmedGrowthRate),]
 
 ##Make lists for input panels##
 countries <- unique(global_data["Country.Region"])
@@ -28,12 +32,20 @@ italian_regions <- unique(italian_data["Province.State"])
 
 
 
-label_dict <- Dict(list("Date.Schools" = "Schools closure",
-                        "Date.Public Places" = "Public places shut down",
-                        "Date.Gatherings" = "Gatherings ban",
-                        "Date.Stay at Home" = "Confinement start",
-                        "Date.Non-essential" = "Non-essential activities ban")
-)
+action_label_dict <- list("Date.Schools" = "Schools closure",
+                    "Date.Public Places" = "Public places shut down",
+                    "Date.Gatherings" = "Gatherings ban",
+                    "Date.Stay at Home" = "Stay at home",
+                    "Date.Non-essential" = "Non-essential activities ban")
+
+# Create the same dict mapping, but reversed (for creating radio buttons)
+action_label_dict_rev <- names(action_label_dict)
+names(action_label_dict_rev) <- unname(action_label_dict)
+
+
+stat_label_dict <- c("Confirmed cases" = "ConfirmedCases",
+                    "Deaths" = "Deaths",
+                    "Recovered" = "Recovered")
 
 
 world_side_panel <- sidebarPanel(
@@ -51,17 +63,12 @@ world_side_panel <- sidebarPanel(
     label = "Days of interest (0 = last day):",
     min = -60,
     max = 0,
-    value = c(-14, 0)
+    value = c(-30, 0)
   ),
   
   checkboxInput("log_scale_world", "Use log scale for Y", FALSE),
   
-  radioButtons("dates", "Show a special date:",
-               c("School closure" = "Date.Schools",
-                 "Public places shut down" = "Date.Public Places",
-                 "Gatherings ban" = "Date.Gatherings",
-                 "Confinement start" = "Date.Stay at Home",
-                 "Non-essential activities ban" = "Date.Non-essential")),
+  radioButtons("dates", "Show a special date:", unlist(action_label_dict_rev)),
   
   sliderInput(
     "smooth_growth_rate_world",
@@ -177,13 +184,29 @@ italy_main_panel <- mainPanel(column(
 ))
 
 
+ranking_side_panel <- sidebarPanel(
+  radioButtons("ranking_date", "Confinement action used in ranking", unlist(action_label_dict_rev))
+)
+
+
+ranking_main_panel <- mainPanel(
+  box(
+    title = "Ranking",
+    width = NULL,
+    solidHeader = TRUE,
+    status = "primary",
+    plotOutput("ranking_plot")
+  )
+)
+
+
 
 ui <- dashboardPage(
   dashboardHeader(title = "CODE VS COVID19"),
-  
-  dashboardSidebar(sidebarMenu(
+    dashboardSidebar(sidebarMenu(
     menuItem("World", tabName = "world", icon = icon("bar-chart-o")),
-    menuItem("Italy", tabName = "italy", icon = icon("bar-chart-o"))
+    menuItem("Italy", tabName = "italy", icon = icon("bar-chart-o")),
+    menuItem("Ranking", tabName = "ranking", icon = icon("bar-chart-o"))
   )),
   
   ## Body content
@@ -194,7 +217,10 @@ ui <- dashboardPage(
             world_main_panel),
     tabItem(tabName = "italy",
             italy_side_panel,
-            italy_main_panel)
+            italy_main_panel),
+    tabItem(tabName = "ranking",
+            ranking_side_panel,
+            ranking_main_panel)
   )))
 )
 
@@ -243,8 +269,8 @@ server <- function(input, output) {
     ggplot(as.data.frame(dataset), aes_string(x = "Date", y = colname)) +
       geom_line() +
       geom_vline(xintercept = dates_to_show) +
-      annotate("text", x = dates_to_show, y = 35, label = label_dict$get(texts_to_show)) + 
-      scale_y_continuous(trans=ifelse(input$log_scale_world & allow_log, "log10", "identity"))+
+      annotate("text", x = dates_to_show, y = 0, label = unlist(action_label_dict[texts_to_show])) + 
+      scale_y_continuous(trans=ifelse(input$log_scale_world & allow_log, "log10", "identity")) +
       theme_bw() 
   })
   
@@ -280,6 +306,21 @@ server <- function(input, output) {
       ylab = input$italy_statistic,
       log = ifelse(input$log_scale_world_IT, "y", "")
     )
+  })
+  
+  output$ranking_plot <- renderPlot({
+    # ConfirmedGrowthRate is hardcoded because we have barely any data for the others
+    z_stat <- compute_z_statistic(global_data_by_action[global_data_by_action$Province.State == "",], "ConfirmedGrowthRate")
+    z_stat <- z_stat[z_stat$Action == input$ranking_date,]
+    z_stat <- z_stat[!is.na(z_stat$Z),]
+    ggplot(z_stat, aes(x = reorder(Country.Region, Z, sum), y = Z)) +
+      geom_col(fill = "lightblue") +
+      geom_text(aes(label = paste("p =", prettyNum(p.value.adj))), position = position_stack(vjust = .5)) +
+      coord_flip() +
+      xlab("Country") +
+      ylab("Z statistic (with p-value)") +
+      scale_color_brewer(type = "qual", palette = 2) +
+      theme_bw()
   })
 }
 
