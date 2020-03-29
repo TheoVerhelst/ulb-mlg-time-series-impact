@@ -1,110 +1,110 @@
-Country.Continent,Country.Region,Province.State,Date.Schools,Date.Public Places,Date.Gatherings,Date.Stay at Home,Date.Lockdown,Date.Non-essential,Gatherings.limit,mandatory,notes
-,Vietnam,Vietnam,2020-02-12T00:00:00.000000000,,,2020-02-13T00:00:00.000000000,,,0,"Yes,Yes","Date estimated,Limited to villages with 10 k people close to caital"
-South America,Venezuela,Venezuela,,,,,2020-3-17,,0,Yes,
-Europe,United Kingdom,United Kingdom,2020-03-20T00:00:00.000000000,2020-03-20T00:00:00.000000000,,2020-03-23T00:00:00.000000000,2020-03-23,,0,"Yes,Yes,Yes",",,"
-North America,US,Montana,2020-03-15T00:00:00.000000000,2020-03-28T00:00:00.000000000,2020-03-24T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,"
-North America,US,Maine,2020-03-18T00:00:00.000000000,2020-03-18T00:00:00.000000000,,,,,0,"Yes,Yes",",School closure doesn't seem mandatory but likely widespread"
-North America,US,Maryland,2020-03-16T00:00:00.000000000,2020-03-16T00:00:00.000000000,,,,2020-03-23T00:00:00.000000000,0,"Yes,Yes,Yes",",,"
-North America,US,Wisconsin,2020-03-18T00:00:00.000000000,2020-03-17T00:00:00.000000000,2020-03-20T00:00:00.000000000,,,2020-03-24T00:00:00.000000000,10,"Yes,Yes,Yes,Yes","Restriction strengthened to order closure of all non-essential business on 3/24,,,"
-North America,US,Michigan,2020-03-12T00:00:00.000000000,2020-03-16T00:00:00.000000000,,2020-03-24T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
-North America,US,Minnesota,2020-03-15T00:00:00.000000000,2020-03-17T00:00:00.000000000,,,,,0,"Yes,Yes",","
-North America,US,Mississippi,2020-03-18T00:00:00.000000000,,,,,,0,Yes,
-North America,US,Missouri,2020-03-17T00:00:00.000000000,2020-03-23T00:00:00.000000000,2020-03-23T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,"
-North America,US,Wyoming,2020-03-15T00:00:00.000000000,2020-03-19T00:00:00.000000000,,,,,0,"Yes,Yes",","
-North America,US,Kentucky,2020-03-16T00:00:00.000000000,2020-03-16T00:00:00.000000000,2020-03-19T00:00:00.000000000,,,2020-03-23T00:00:00.000000000,100,"Yes,No,Yes,No",",,No explicit number identified, just an estimate,"
-North America,US,Nebraska,2020-03-13T00:00:00.000000000,2020-03-16T00:00:00.000000000,2020-03-16T00:00:00.000000000,,,,50,"No,Yes,Yes","Place contingent depending on community transmission,Place contingent depending on community transmission,"
-North America,US,Nevada,2020-03-16T00:00:00.000000000,,,,,2020-03-17T00:00:00.000000000,0,"Yes,Yes",","
-North America,US,New Hampshire,2020-03-16T00:00:00.000000000,2020-03-16T00:00:00.000000000,[],,,,60,"No,Yes,Yes,Yes",",,,"
-North America,US,New Jersey,2020-03-18T00:00:00.000000000,2020-03-16T00:00:00.000000000,,2020-03-21T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
-North America,US,New Mexico,2020-03-16T00:00:00.000000000,2020-03-15T00:00:00.000000000,2020-03-24T00:00:00.000000000,,,2020-03-24T00:00:00.000000000,10,"Yes,Yes,Yes,No","Only partial restrictions (less than 50 percent of seating, tables six feet apart),,,"
-North America,US,New York,2020-03-16T00:00:00.000000000,2020-03-16T00:00:00.000000000,,2020-03-21T00:00:00.000000000,2020-3-22,,0,"Yes,Yes,Yes",",,"
-North America,US,Louisiana,2020-03-13T00:00:00.000000000,2020-03-16T00:00:00.000000000,,2020-03-23T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
-North America,US,Iowa,2020-03-16T00:00:00.000000000,2020-03-17T00:00:00.000000000,,,,,0,"No,No",","
-North America,US,Kansas,2020-03-17T00:00:00.000000000,,[],,,,60,"Yes,Yes,Yes",",,"
-North America,US,North Dakota,2020-03-15T00:00:00.000000000,2020-03-20T00:00:00.000000000,,,,,0,"Yes,Yes",","
-North America,US,Indiana,2020-03-15T00:00:00.000000000,2020-03-16T00:00:00.000000000,,2020-03-23T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
-North America,US,Illinois,2020-03-13T00:00:00.000000000,2020-03-16T00:00:00.000000000,,2020-03-21T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
-North America,US,Idaho,2020-03-23T00:00:00.000000000,2020-03-18T00:00:00.000000000,,,,,0,"No,No","Restrictions only partial,"
-North America,US,Hawaii,2020-03-13T00:00:00.000000000,2020-03-17T00:00:00.000000000,,2020-03-25T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
-North America,US,Georgia,2020-03-18T00:00:00.000000000,2020-03-24T00:00:00.000000000,2020-03-24T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,"
-North America,US,Florida,2020-03-16T00:00:00.000000000,2020-03-17T00:00:00.000000000,,,,,0,"Yes,Yes",",Restrictions only partial - restaurants and bars can still have some people in"
-North America,US,Delaware,2020-03-16T00:00:00.000000000,2020-03-16T00:00:00.000000000,,2020-03-23T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
-North America,US,Connecticut,2020-03-15T00:00:00.000000000,2020-03-16T00:00:00.000000000,,,,2020-03-20T00:00:00.000000000,0,"Yes,Yes,Yes",",,"
-North America,US,Colorado,2020-03-18T00:00:00.000000000,2020-03-01T00:00:00.000000000,2020-03-18T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,"
-North America,US,California,2020-03-12T00:00:00.000000000,2020-03-17T00:00:00.000000000,,2020-03-19T00:00:00.000000000,2020-3-19,,0,"Yes,Yes,Yes",",,"
-North America,US,Arkansas,2020-03-17T00:00:00.000000000,,,,,,0,Yes,
-North America,US,Arizona,2020-03-16T00:00:00.000000000,2020-03-20T00:00:00.000000000,,,,,0,"Yes,Yes",",Only in counties w confirmed cases"
-North America,US,Alaska,2020-03-16T00:00:00.000000000,2020-03-18T00:00:00.000000000,2020-03-24T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,"
-North America,US,North Carolina,2020-03-16T00:00:00.000000000,2020-03-17T00:00:00.000000000,2020-03-23T00:00:00.000000000,,,,50,"Yes,Yes,Yes",",,"
-North America,US,Massachusetts,2020-03-17T00:00:00.000000000,2020-03-17T00:00:00.000000000,,2020-03-24T00:00:00.000000000,,2020-03-24T00:00:00.000000000,0,"Yes,Yes,Yes,No",",School closure date estimated, may have been a bit earlier; Restrictions extended to 'all non-essential businesses' on 3/24,,"
-North America,US,Alabama,2020-03-18T00:00:00.000000000,2020-03-20T00:00:00.000000000,,,,,0,"Yes,Yes",","
-North America,US,Puerto Rico,2020-03-16T00:00:00.000000000,,,2020-03-16T00:00:00.000000000,,,0,"Yes,Yes",","
-North America,US,Utah,2020-03-16T00:00:00.000000000,2020-03-18T00:00:00.000000000,2020-03-18T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,"
-North America,US,Vermont,2020-03-18T00:00:00.000000000,2020-03-16T00:00:00.000000000,,2020-03-24T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
-North America,US,Virginia,2020-03-13T00:00:00.000000000,2020-03-17T00:00:00.000000000,2020-03-24T00:00:00.000000000,,,2020-03-24T00:00:00.000000000,10,"Yes,Yes,Yes,Yes",",Restriction on bars and restaurants not toal, limits to 10 patrons,,"
-North America,US,South Dakota,2020-03-13T00:00:00.000000000,,2020-03-24T00:00:00.000000000,,,,10,"Yes,No",","
-North America,US,South Carolina,2020-03-14T00:00:00.000000000,2020-03-18T00:00:00.000000000,2020-03-23T00:00:00.000000000,,,,3,"Yes,Yes,No",",,"
-North America,US,Washington,2020-03-15T00:00:00.000000000,2020-03-15T00:00:00.000000000,,2020-03-23T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
-North America,US,Washington DC,2020-03-16T00:00:00.000000000,2020-03-15T00:00:00.000000000,,,,,0,"Yes,Yes",","
-North America,US,Tennessee,2020-03-16T00:00:00.000000000,2020-03-23T00:00:00.000000000,2020-03-23T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,"
-North America,US,West Virginia,2020-03-17T00:00:00.000000000,2020-03-17T00:00:00.000000000,,2020-03-24T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
-North America,US,Rhode Island,2020-03-17T00:00:00.000000000,2020-03-17T00:00:00.000000000,[],,,2020-03-23T00:00:00.000000000,35,"Yes,Yes,Yes,No,No",",,,,"
-North America,US,Texas,2020-03-20T00:00:00.000000000,2020-03-20T00:00:00.000000000,2020-03-20T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,"
-North America,US,Oregon,2020-03-15T00:00:00.000000000,2020-03-16T00:00:00.000000000,,2020-03-24T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
-North America,US,Pennsylvania,2020-03-16T00:00:00.000000000,,,2020-03-23T00:00:00.000000000,,2020-03-17T00:00:00.000000000,0,"Yes,Yes,Yes",",,Not statewide"
-North America,US,Ohio,2020-03-15T00:00:00.000000000,2020-03-15T00:00:00.000000000,,2020-03-24T00:00:00.000000000,,,0,"Yes,Yes,Yes",",,"
-North America,US,Oklahoma,2020-03-17T00:00:00.000000000,,2020-03-24T00:00:00.000000000,,,2020-03-25T00:00:00.000000000,10,"Yes,Yes,Yes",",,Only in counies with 'community spread'"
-,Turkey,Turkey,2020-03-16T00:00:00.000000000,2020-03-16T00:00:00.000000000,,,,,0,"Yes,Yes",","
-Africa,Tunisia,Tunisia,,,,,2020-3-22,,0,,
-,Taiwan,Taiwan,2020-02-02T00:00:00.000000000,,,,,,0,Yes,
-Europe,Switzerland,Switzerland,2020-03-13T00:00:00.000000000,,2020-03-20T00:00:00.000000000,,2020-3-24,2020-03-16T00:00:00.000000000,5,"Yes,Yes,Yes",",,"
-,Sweden,Sweden,2020-03-17T00:00:00.000000000,,2020-03-11T00:00:00.000000000,,,,500,"Yes,No",","
-Europe,Spain,Spain,2020-03-12T00:00:00.000000000,,,2020-03-15T00:00:00.000000000,2020-03-14,,0,"Yes,Yes",","
-Africa,South Africa,South Africa,,,,2020-03-26T00:00:00.000000000,2020-03-27,,0,Yes,
-,San Francisco,San Francisco,,,,2020-03-17T00:00:00.000000000,,,0,Yes,
-,Rwanda,Rwanda,,,,2020-03-21T00:00:00.000000000,,,0,Yes,
-Europe,Portugal,Portugal,2020-03-19T00:00:00.000000000,2020-03-19T00:00:00.000000000,,,2020-03-18,,0,"Yes,Yes","Fairlly substantial restrictions,"
-,Poland,Poland,2020-03-12T00:00:00.000000000,2020-03-12T00:00:00.000000000,,,,,500,"Yes,Yes",","
-,Peru,Peru,,,,2020-03-15T00:00:00.000000000,,,0,Yes,
-,Paraguay,Paraguay,2020-03-10T00:00:00.000000000,,2020-03-10T00:00:00.000000000,,,,1000,"Yes,Yes",",Large scale public events"
-,Norway,Norway,2020-03-12T00:00:00.000000000,2020-03-12T00:00:00.000000000,,,,,0,"Yes,Yes","Restrictions not total (could still dine in, for instance),"
-,New Zealand,New Zealand,,,,2020-03-23T00:00:00.000000000,,,0,Yes,
-,Netherlands,Netherlands,2020-03-15T00:00:00.000000000,2020-03-15T00:00:00.000000000,2020-03-23T00:00:00.000000000,,,,3,"Yes,Yes,Yes",",,"
-Africa,Morocco,Morocco,,,,,2020-3-23,,0,,
-Africa,Mauritius Islands,Mauritius Islands,,,,,2020-3-24,,0,,
-,Mali,Mali,2020-03-17T00:00:00.000000000,,2020-03-17T00:00:00.000000000,,,,50,"Yes,Yes",","
-,Malaysia,Malaysia,,,,2020-03-18T00:00:00.000000000,,,0,Yes,
-Middle East,Lebannon,Lebannon,,,,,2020-3-15,,0,Yes,
-,Korea,Korea,2020-02-23T00:00:00.000000000,,,,,,0,Yes,
-,Kenya,Kenya,2020-03-15T00:00:00.000000000,,,,,,0,Yes,
-,Japan,Japan,2020-03-02T00:00:00.000000000,2020-02-25T00:00:00.000000000,,,,,0,"No,No",","
-Africa,Ivory Coast,Ivory Coast,,,,,2020-3-23,,0,,
-Europe,Italy,Northen Italy,,,,,,2020-03-08,0,Yes,"affecting over sixteen million people, restricting travel from, to or within the affected areas, banning funerals and cultural events, and requiring people to keep at least one metre of distance from one another in public locations such as restaurants, churches and supermarkets"
-Europe,Italy,Lodi,,,,,2020-02-21,,0,Yes,"covering eleven municipalities of the province of Lodi in Lombardy, and affecting around 50,000 people"
-Europe,Italy,Italy,2020-03-04T00:00:00.000000000,2020-03-09T00:00:00.000000000,,2020-03-19T00:00:00.000000000,2020-03-10,2020-03-11T00:00:00.000000000,0,"Yes,Yes,Yes,Yes",",,,"
-,Israel,Israel,2020-03-12T00:00:00.000000000,2020-03-15T00:00:00.000000000,,2020-03-19T00:00:00.000000000,2020-3-17,,0,"Yes,Yes,Yes",",,"
-Europe,Ireland,Ireland,2020-03-13T00:00:00.000000000,,2020-03-13T00:00:00.000000000,,2020-3-24,,100,"Yes,Yes",","
-Middle East,Iraq,Iraq,,,,,2020-3-28,,0,Yes,
-,Iran,Iran,2020-03-05T00:00:00.000000000,,,2020-03-13T00:00:00.000000000,,,0,"Yes,Yes",",Lockdown pervasiveness/effectiveness not clear"
-Asia,India,India,,,,,2020-3-24,,0,Yes,
-Europe,Hungary,Hungary,,,,,2020-3-27,,0,Yes,
-Europe,Greece,Greece,,,,,2020-3-23,,0,,
-Europe,Germany,Germany,2020-03-13T00:00:00.000000000,,,2020-03-21T00:00:00.000000000,2020-03-22,,0,"No,Yes",","
-Europe,France,France,2020-03-16T00:00:00.000000000,,2020-03-13T00:00:00.000000000,2020-03-17T00:00:00.000000000,2020-03-17,2020-03-15T00:00:00.000000000,100,"Yes,Yes,Yes,Yes",",,,"
-,El Salvador,El Salvador,,,,2020-03-12T00:00:00.000000000,,,0,Yes,
-Europe,Denmark,Denmark,2020-03-16T00:00:00.000000000,,,2020-03-16T00:00:00.000000000,2020-03-11,,0,"Yes,Yes",","
-Africa,DRC,Kinshasa,,,,,2020-3-28,,0,,
-Europe,Czech Republic,Czech,2020-03-13T00:00:00.000000000,2020-03-13T00:00:00.000000000,,2020-03-17T00:00:00.000000000,2020-03-16,,0,"Yes,Yes,Yes","3/18: everyone is required to cover their nose and mouth with some mask or scarf when outside.,,"
-South America,Colombia,Colombia,,,,2020-03-25T00:00:00.000000000,2020-3-24,,0,Yes,
-Asia,China,China,2020-01-26T00:00:00.000000000,2020-01-26T00:00:00.000000000,,,,,0,"Yes,Yes",",Covered most of the country (not 100%)"
-Asia,China,China (Hubei),,,,,2020-01-24T00:00:00.000000000,2020-02-13,0,Yes,"12 cities in Hubei. Shut down all non-essential companies, including manufacturing plants"
-Asia,China,China (Wuhan),,,,,2020-01-23T00:00:00.000000000,,0,Yes,"all public transport, including buses, railways, flights, and ferry services would be suspended"
-,Canada,Canada,2020-03-15T00:00:00.000000000,2020-03-20T00:00:00.000000000,,,,,0,"Yes,Yes",",Dates are estimates as they vary by province. Looks like schools are pretty much everywhere and general restrictions 90 percent or more of country"
-Europe,Bulgaria,Bulgaria,,,,,2020-3-19,,0,,
-South America,Brazil,Sao Paulo,,,,,2020-3-24,,0,Yes,
-Europe,Belgium,Belgium,,,,2020-03-18T00:00:00.000000000,2020-03-18,,0,Yes,
-Europe,Austria,Austria,,,,2020-03-16T00:00:00.000000000,2020-03-16,,0,Yes,
-,Australia,Australia,,2020-03-23T00:00:00.000000000,,,,,0,Yes,
-,Atlanta,Atlanta,,2020-03-19T00:00:00.000000000,,,,,0,Yes,
-South America,Argentina,Argentina,,,,2020-03-20T00:00:00.000000000,2020-3-19,,0,Yes,
-Africa,Algeria,Algeria,,,,,2020-3-28,,0,,
+Country.Continent,Country.Region,Province.State,Date.Schools,Date.Public Places,Date.Gatherings,Date.Stay at Home,Date.Lockdown,Date.Non-essential,Gatherings.limit,mandatory,notes,Date.Date.Gatherings
+,Vietnam,Vietnam,2020-02-12,,,2020-02-13,,,0,"Yes,Yes","Date estimated,Limited to villages with 10 k people close to caital",
+South America,Venezuela,Venezuela,,,,,2020-03-17,,0,Yes,,
+Europe,United Kingdom,United Kingdom,2020-03-20,2020-03-20,,2020-03-23,2020-03-23,,0,"Yes,Yes,Yes",",,",
+North America,US,Montana,2020-03-15,2020-03-28,2020-03-24T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,",2020-03-24
+North America,US,Maine,2020-03-18,2020-03-18,,,,,0,"Yes,Yes",",School closure doesn't seem mandatory but likely widespread",
+North America,US,Maryland,2020-03-16,2020-03-16,,,,2020-03-23,0,"Yes,Yes,Yes",",,",
+North America,US,Wisconsin,2020-03-18,2020-03-17,2020-03-20T00:00:00.000000000,,,2020-03-24,10,"Yes,Yes,Yes,Yes","Restriction strengthened to order closure of all non-essential business on 3/24,,,",2020-03-20
+North America,US,Michigan,2020-03-12,2020-03-16,,2020-03-24,,,0,"Yes,Yes,Yes",",,",
+North America,US,Minnesota,2020-03-15,2020-03-17,,,,,0,"Yes,Yes",",",
+North America,US,Mississippi,2020-03-18,,,,,,0,Yes,,
+North America,US,Missouri,2020-03-17,2020-03-23,2020-03-23T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,",2020-03-23
+North America,US,Wyoming,2020-03-15,2020-03-19,,,,,0,"Yes,Yes",",",
+North America,US,Kentucky,2020-03-16,2020-03-16,2020-03-19T00:00:00.000000000,,,2020-03-23,100,"Yes,No,Yes,No",",,No explicit number identified, just an estimate,",2020-03-19
+North America,US,Nebraska,2020-03-13,2020-03-16,2020-03-16T00:00:00.000000000,,,,50,"No,Yes,Yes","Place contingent depending on community transmission,Place contingent depending on community transmission,",2020-03-16
+North America,US,Nevada,2020-03-16,,,,,2020-03-17,0,"Yes,Yes",",",
+North America,US,New Hampshire,2020-03-16,2020-03-16,,,,,60,"No,Yes,Yes,Yes",",,,",
+North America,US,New Jersey,2020-03-18,2020-03-16,,2020-03-21,,,0,"Yes,Yes,Yes",",,",
+North America,US,New Mexico,2020-03-16,2020-03-15,2020-03-24T00:00:00.000000000,,,2020-03-24,10,"Yes,Yes,Yes,No","Only partial restrictions (less than 50 percent of seating, tables six feet apart),,,",2020-03-24
+North America,US,New York,2020-03-16,2020-03-16,,2020-03-21,2020-03-22,,0,"Yes,Yes,Yes",",,",
+North America,US,Louisiana,2020-03-13,2020-03-16,,2020-03-23,,,0,"Yes,Yes,Yes",",,",
+North America,US,Iowa,2020-03-16,2020-03-17,,,,,0,"No,No",",",
+North America,US,Kansas,2020-03-17,,,,,,60,"Yes,Yes,Yes",",,",
+North America,US,North Dakota,2020-03-15,2020-03-20,,,,,0,"Yes,Yes",",",
+North America,US,Indiana,2020-03-15,2020-03-16,,2020-03-23,,,0,"Yes,Yes,Yes",",,",
+North America,US,Illinois,2020-03-13,2020-03-16,,2020-03-21,,,0,"Yes,Yes,Yes",",,",
+North America,US,Idaho,2020-03-23,2020-03-18,,,,,0,"No,No","Restrictions only partial,",
+North America,US,Hawaii,2020-03-13,2020-03-17,,2020-03-25,,,0,"Yes,Yes,Yes",",,",
+North America,US,Georgia,2020-03-18,2020-03-24,2020-03-24T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,",2020-03-24
+North America,US,Florida,2020-03-16,2020-03-17,,,,,0,"Yes,Yes",",Restrictions only partial - restaurants and bars can still have some people in",
+North America,US,Delaware,2020-03-16,2020-03-16,,2020-03-23,,,0,"Yes,Yes,Yes",",,",
+North America,US,Connecticut,2020-03-15,2020-03-16,,,,2020-03-20,0,"Yes,Yes,Yes",",,",
+North America,US,Colorado,2020-03-18,2020-03-01,2020-03-18T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,",2020-03-18
+North America,US,California,2020-03-12,2020-03-17,,2020-03-19,2020-03-19,,0,"Yes,Yes,Yes",",,",
+North America,US,Arkansas,2020-03-17,,,,,,0,Yes,,
+North America,US,Arizona,2020-03-16,2020-03-20,,,,,0,"Yes,Yes",",Only in counties w confirmed cases",
+North America,US,Alaska,2020-03-16,2020-03-18,2020-03-24T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,",2020-03-24
+North America,US,North Carolina,2020-03-16,2020-03-17,2020-03-23T00:00:00.000000000,,,,50,"Yes,Yes,Yes",",,",2020-03-23
+North America,US,Massachusetts,2020-03-17,2020-03-17,,2020-03-24,,2020-03-24,0,"Yes,Yes,Yes,No",",School closure date estimated, may have been a bit earlier; Restrictions extended to 'all non-essential businesses' on 3/24,,",
+North America,US,Alabama,2020-03-18,2020-03-20,,,,,0,"Yes,Yes",",",
+North America,US,Puerto Rico,2020-03-16,,,2020-03-16,,,0,"Yes,Yes",",",
+North America,US,Utah,2020-03-16,2020-03-18,2020-03-18T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,",2020-03-18
+North America,US,Vermont,2020-03-18,2020-03-16,,2020-03-24,,,0,"Yes,Yes,Yes",",,",
+North America,US,Virginia,2020-03-13,2020-03-17,2020-03-24T00:00:00.000000000,,,2020-03-24,10,"Yes,Yes,Yes,Yes",",Restriction on bars and restaurants not toal, limits to 10 patrons,,",2020-03-24
+North America,US,South Dakota,2020-03-13,,2020-03-24T00:00:00.000000000,,,,10,"Yes,No",",",2020-03-24
+North America,US,South Carolina,2020-03-14,2020-03-18,2020-03-23T00:00:00.000000000,,,,3,"Yes,Yes,No",",,",2020-03-23
+North America,US,Washington,2020-03-15,2020-03-15,,2020-03-23,,,0,"Yes,Yes,Yes",",,",
+North America,US,Washington DC,2020-03-16,2020-03-15,,,,,0,"Yes,Yes",",",
+North America,US,Tennessee,2020-03-16,2020-03-23,2020-03-23T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,",2020-03-23
+North America,US,West Virginia,2020-03-17,2020-03-17,,2020-03-24,,,0,"Yes,Yes,Yes",",,",
+North America,US,Rhode Island,2020-03-17,2020-03-17,,,,2020-03-23,35,"Yes,Yes,Yes,No,No",",,,,",
+North America,US,Texas,2020-03-20,2020-03-20,2020-03-20T00:00:00.000000000,,,,10,"Yes,Yes,Yes",",,",2020-03-20
+North America,US,Oregon,2020-03-15,2020-03-16,,2020-03-24,,,0,"Yes,Yes,Yes",",,",
+North America,US,Pennsylvania,2020-03-16,,,2020-03-23,,2020-03-17,0,"Yes,Yes,Yes",",,Not statewide",
+North America,US,Ohio,2020-03-15,2020-03-15,,2020-03-24,,,0,"Yes,Yes,Yes",",,",
+North America,US,Oklahoma,2020-03-17,,2020-03-24T00:00:00.000000000,,,2020-03-25,10,"Yes,Yes,Yes",",,Only in counies with 'community spread'",2020-03-24
+,Turkey,Turkey,2020-03-16,2020-03-16,,,,,0,"Yes,Yes",",",
+Africa,Tunisia,Tunisia,,,,,2020-03-22,,0,,,
+,Taiwan,Taiwan,2020-02-02,,,,,,0,Yes,,
+Europe,Switzerland,Switzerland,2020-03-13,,2020-03-20T00:00:00.000000000,,2020-03-24,2020-03-16,5,"Yes,Yes,Yes",",,",2020-03-20
+,Sweden,Sweden,2020-03-17,,2020-03-11T00:00:00.000000000,,,,500,"Yes,No",",",2020-03-11
+Europe,Spain,Spain,2020-03-12,,,2020-03-15,2020-03-14,,0,"Yes,Yes",",",
+Africa,South Africa,South Africa,,,,2020-03-26,2020-03-27,,0,Yes,,
+,San Francisco,San Francisco,,,,2020-03-17,,,0,Yes,,
+,Rwanda,Rwanda,,,,2020-03-21,,,0,Yes,,
+Europe,Portugal,Portugal,2020-03-19,2020-03-19,,,2020-03-18,,0,"Yes,Yes","Fairlly substantial restrictions,",
+,Poland,Poland,2020-03-12,2020-03-12,,,,,500,"Yes,Yes",",",
+,Peru,Peru,,,,2020-03-15,,,0,Yes,,
+,Paraguay,Paraguay,2020-03-10,,2020-03-10T00:00:00.000000000,,,,1000,"Yes,Yes",",Large scale public events",2020-03-10
+,Norway,Norway,2020-03-12,2020-03-12,,,,,0,"Yes,Yes","Restrictions not total (could still dine in, for instance),",
+,New Zealand,New Zealand,,,,2020-03-23,,,0,Yes,,
+,Netherlands,Netherlands,2020-03-15,2020-03-15,2020-03-23T00:00:00.000000000,,,,3,"Yes,Yes,Yes",",,",2020-03-23
+Africa,Morocco,Morocco,,,,,2020-03-23,,0,,,
+Africa,Mauritius Islands,Mauritius Islands,,,,,2020-03-24,,0,,,
+,Mali,Mali,2020-03-17,,2020-03-17T00:00:00.000000000,,,,50,"Yes,Yes",",",2020-03-17
+,Malaysia,Malaysia,,,,2020-03-18,,,0,Yes,,
+Middle East,Lebannon,Lebannon,,,,,2020-03-15,,0,Yes,,
+,Korea,Korea,2020-02-23,,,,,,0,Yes,,
+,Kenya,Kenya,2020-03-15,,,,,,0,Yes,,
+,Japan,Japan,2020-03-02,2020-02-25,,,,,0,"No,No",",",
+Africa,Ivory Coast,Ivory Coast,,,,,2020-03-23,,0,,,
+Europe,Italy,Northen Italy,,,,,,2020-03-08,0,Yes,"affecting over sixteen million people, restricting travel from, to or within the affected areas, banning funerals and cultural events, and requiring people to keep at least one metre of distance from one another in public locations such as restaurants, churches and supermarkets",
+Europe,Italy,Lodi,,,,,2020-02-21,,0,Yes,"covering eleven municipalities of the province of Lodi in Lombardy, and affecting around 50,000 people",
+Europe,Italy,Italy,2020-03-04,2020-03-09,,2020-03-19,2020-03-10,2020-03-11,0,"Yes,Yes,Yes,Yes",",,,",
+,Israel,Israel,2020-03-12,2020-03-15,,2020-03-19,2020-03-17,,0,"Yes,Yes,Yes",",,",
+Europe,Ireland,Ireland,2020-03-13,,2020-03-13T00:00:00.000000000,,2020-03-24,,100,"Yes,Yes",",",2020-03-13
+Middle East,Iraq,Iraq,,,,,2020-03-28,,0,Yes,,
+,Iran,Iran,2020-03-05,,,2020-03-13,,,0,"Yes,Yes",",Lockdown pervasiveness/effectiveness not clear",
+Asia,India,India,,,,,2020-03-24,,0,Yes,,
+Europe,Hungary,Hungary,,,,,2020-03-27,,0,Yes,,
+Europe,Greece,Greece,,,,,2020-03-23,,0,,,
+Europe,Germany,Germany,2020-03-13,,,2020-03-21,2020-03-22,,0,"No,Yes",",",
+Europe,France,France,2020-03-16,,2020-03-13T00:00:00.000000000,2020-03-17,2020-03-17,2020-03-15,100,"Yes,Yes,Yes,Yes",",,,",2020-03-13
+,El Salvador,El Salvador,,,,2020-03-12,,,0,Yes,,
+Europe,Denmark,Denmark,2020-03-16,,,2020-03-16,2020-03-11,,0,"Yes,Yes",",",
+Africa,DRC,Kinshasa,,,,,2020-03-28,,0,,,
+Europe,Czech Republic,Czech,2020-03-13,2020-03-13,,2020-03-17,2020-03-16,,0,"Yes,Yes,Yes","3/18: everyone is required to cover their nose and mouth with some mask or scarf when outside.,,",
+South America,Colombia,Colombia,,,,2020-03-25,2020-03-24,,0,Yes,,
+Asia,China,China,2020-01-26,2020-01-26,,,,,0,"Yes,Yes",",Covered most of the country (not 100%)",
+Asia,China,China (Hubei),,,,,2020-01-24,2020-02-13,0,Yes,"12 cities in Hubei. Shut down all non-essential companies, including manufacturing plants",
+Asia,China,China (Wuhan),,,,,2020-01-23,,0,Yes,"all public transport, including buses, railways, flights, and ferry services would be suspended",
+,Canada,Canada,2020-03-15,2020-03-20,,,,,0,"Yes,Yes",",Dates are estimates as they vary by province. Looks like schools are pretty much everywhere and general restrictions 90 percent or more of country",
+Europe,Bulgaria,Bulgaria,,,,,2020-03-19,,0,,,
+South America,Brazil,Sao Paulo,,,,,2020-03-24,,0,Yes,,
+Europe,Belgium,Belgium,,,,2020-03-18,2020-03-18,,0,Yes,,
+Europe,Austria,Austria,,,,2020-03-16,2020-03-16,,0,Yes,,
+,Australia,Australia,,2020-03-23,,,,,0,Yes,,
+,Atlanta,Atlanta,,2020-03-19,,,,,0,Yes,,
+South America,Argentina,Argentina,,,,2020-03-20,2020-03-19,,0,Yes,,
+Africa,Algeria,Algeria,,,,,2020-03-28,,0,,,
