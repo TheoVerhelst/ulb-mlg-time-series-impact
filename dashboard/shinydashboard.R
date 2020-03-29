@@ -1,206 +1,224 @@
 ## app.R ##
+library(dplyr)
 library(shiny)
 library(shinydashboard)
 
 
-#
-url_confirmed <- "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/Global_JohnsHopkins/time_series_covid19_confirmed_global.csv?raw=true"
-url_deaths <- "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/Global_JohnsHopkins/time_series_covid19_deaths_global.csv?raw=true"
-url_recovered <- "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/Global_JohnsHopkins/time_series_covid19_recovered_global.csv?raw=true"
-url_italy <- "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/Italy/dpc-covid19-ita-regioni-latest.csv?raw=true"
-#
+##Download and Update Data##
+url_data_info <- "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/COVID19_Country_Info.Rdata?raw=true"
+url_data_global <- "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/COVID19_Global_Italy.Rdata?raw=true"
+url_data_global_wgrowth <- "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/COVID19_Global_Italy_wGrowth.Rdata?raw=true"
+download.file(url_data_global, destfile= "./COVID19_Global_Italy.Rdata", mode = "wb")
+download.file(url_data_info, destfile= "./COVID19_Country_Info.Rdata", mode = "wb")
+download.file(url_data_global_wgrowth, destfile= "./COVID19_Global_Italy_wGrowth.Rdata", mode = "wb")
 
-download.file(url_confirmed, destfile= "./time_series_covid19_confirmed_global.csv", mode = "wb")
-download.file(url_deaths, destfile= "./time_series_covid19_deaths_global.csv", mode = "wb")
-download.file(url_recovered, destfile= "./time_series_covid19_recovered_global.csv", mode = "wb")
-download.file(url_italy, destfile= "./dpc-covid19-ita-regioni-latest.csv", mode = "wb")
+info_data <- readRDS("./COVID19_Country_Info.Rdata")
+global_data <- readRDS("./COVID19_Global_Italy_wGrowth.Rdata")
 
-confirmed <- read.csv("time_series_covid19_confirmed_global.csv")
-deaths <- read.csv("time_series_covid19_deaths_global.csv")
-recovered <- read.csv("time_series_covid19_recovered_global.csv")
-italy <- read.csv("dpc-covid19-ita-regioni-latest.csv")
 
-#The combination of Country and Province creates UNIQUE values for COUNTRIES SELECTION
-confirmed <- within(confirmed,  Country.Region <- paste(Country.Region, Province.State, sep=" "))
-deaths <- within(deaths,  Country.Region <- paste(Country.Region, Province.State, sep=" "))
-recovered <- within(recovered,  Country.Region <- paste(Country.Region, Province.State, sep=" "))
+
+##Split between Italian and Global Data##
+italian_data <- global_data[(global_data$Country.Region == "Italy") & (global_data$Province.State!="") ,]
+global_data <- setdiff(global_data,italian_data)
+
+
+
+##Make lists for input panels##
+countries <- unique(global_data["Country.Region"])
+countries_with_regions <- unique(global_data[global_data$Province.State != "","Country.Region" ])
+statistics_italy <- names(global_data)[6:15]
+statistics_global <- names(global_data)[6:8]
+italian_regions <- unique(italian_data["Province.State"])
+
 
 
 
 ui <- dashboardPage(
+  
   dashboardHeader(title = "CODE VS COVID19"),
-  dashboardSidebar(
-    sidebarMenu(
-      menuItem("World", tabName = "world", icon = icon("dashboard")),
-      menuItem("Italy - compare", tabName = "italy_compare", icon = icon("dashboard")),
-      menuItem("Italy - Statistics", tabName = "italy_statistics", icon = icon("dashboard"))
-    )
-  ),
-  ## Body content
-  dashboardBody(
-    tabItems(
-      # First tab content
-      tabItem(tabName = "world",
-              fluidRow(
-                box(plotOutput("distPlot", height = 350)),
-              
-                box(
-                  title = "Controls",
-                  selectInput(inputId = "country",
-                              label = "Choose a country:",
-                              choices = confirmed["Country.Region"]), 
+    dashboardSidebar(
+      sidebarMenu(
+        
+          menuItem("World", tabName = "world", icon = icon("bar-chart-o"),
+                   
+                   selectInput(inputId = "country",
+                               label = "Choose a country:",
+                               selected = countries[0],
+                               choices = countries), 
+                   
+                   
+                   uiOutput("region_selector"),
+                   
+    
+                   
+                   sliderInput("range", 
+                               label = "Days of interest (0 = last day):",
+                               min = -60, max = 0, value = c(-7, 0))
+                   ),
+          
+        
+          menuItem("Italy",tabName = "italy", icon = icon("bar-chart-o"),
+                 
+                  selectInput(inputId = "italy_region",
+                             label = "Choose a region:",
+                             selected = italian_regions[0],
+                             choices = italian_regions), 
                   
-                  selectInput(inputId = "dataset",
-                              label = "Choose a dataset:",
-                              choices = c("Confirmed", "Deaths", "Recovered")),
+                  selectInput(inputId = "italy_statistics",
+                              label = "Choose a statistic:",
+                              selected = statistics_italy[0],
+                              choices = statistics_italy), 
                   
                   sliderInput("range", 
                               label = "Days of interest (0 = last day):",
-                              min = -60, max = 0, value = c(-60, 0)))                
-                )
-              
-      ),
-      
-      # Second tab content
-      tabItem(tabName = "italy_compare",
-              
-              fluidRow(
-                box(plotOutput("statsItaly")
-              )),
-              
-              box(
-                  title = "Controls",
-                  selectInput(inputId = "statsChosenITA",
-                              label = "Choose a statistics:",
-                              choices = colnames(italy)[7:16])
-              
-              )
-      ),
-      
-      tabItem(tabName = "italy_statistics",
-              
-              box(
-                title = "Controls",
-                selectInput(inputId = "regChosenITA",
-                            label = "Choose an Italian Region:",
-                            choices = italy[,"denominazione_regione"]
-                )
-              ),
+                              min = -60, max = 0, value = c(-7, 0))
                 
-              fluidRow(  
-              
-                infoBoxOutput("tests"),
-                infoBoxOutput("total"),
-                infoBoxOutput("home"),
-                infoBoxOutput("hospitalized"),
-                infoBoxOutput("intensive"),
-                infoBoxOutput("confirmed"),
-                infoBoxOutput("recovered"),
-                infoBoxOutput("deaths")
+        )
+      ) 
+        
+    ),
+    
 
-              ))
-      
+    
+
+  ## Body content
+  dashboardBody(
+    
+    column(width = 4,
+           box(
+             title = "Confirmed", width = NULL, solidHeader = TRUE, status = "primary",
+             plotOutput("confirmed_plot")
+           ),
+           box(
+             title = "Confirmed Growth Rate", width = NULL, solidHeader = TRUE, status = "primary",
+             plotOutput("confirmed_growth_plot")
+           )
+    ),
+    
+    column(width = 4,
+           box(
+             title = "Recovered", width = NULL,solidHeader = TRUE, status = "primary",
+             plotOutput("recovered_plot")
+           ),
+           box(
+             title = "Recovered Growth Rate", width = NULL, solidHeader = TRUE, status = "primary",
+             plotOutput("recovered_growth_plot")
+           )
+    ),
+    
+    column(width = 4,
+           box(
+             title = "Deaths", width = NULL, solidHeader = TRUE,status = "primary",
+             plotOutput("deaths_plot")
+           ),
+           box(
+             title = "Deaths Growth Rate", width = NULL, solidHeader = TRUE, status = "primary",
+             plotOutput("deaths_growth_plot")
+           )
     )
+    
+   
 )
 )
+
+
+
 
 server <- function(input, output) {
   
-## FIRST TAB 
   
+  #slice exact part of dataset
   datasetInput <- reactive({
-    switch(input$dataset,
-           "Confirmed" = confirmed,
-           "Deaths" = deaths,
-           "Recovered" = recovered)
-  })
-  
- 
-  output$statsItaly <- renderPlot({
+    min_date = Sys.Date()+input$range[1]
+    max_date = Sys.Date()+input$range[2]
+
     
-    selection = input$statsChosenITA
-    labels <- italy[,"denominazione_regione"]
-    data <- italy[,selection] 
-    barplot(data, names.arg=labels, horiz = TRUE, las = 1 ) 
+    if (!is.null(input$region)) {
+      #we assume Region names are unique
+      return(global_data[(global_data$Province.State == input$region) & (global_data$Date >= min_date) & (global_data$Date <= max_date), ]  )
+          
+    } else {
+      
+      return(global_data[(global_data$Country.Region == input$country) & (global_data$Province.State == "") & (global_data$Date >= min_date) & (global_data$Date <= max_date), ])
+      
+    }
+    
+  })
+  
+  ## Render the region selector if a country with regions is chosen
+  output$region_selector <- renderUI({
+    
+    if (input$country %in% countries_with_regions) {
+      selectInput(inputId = 'region',
+                  label = 'Choose a region:',
+                  choices = unique(global_data[global_data$Country.Region == input$country ,"Province.State"])
+                  )
+    } else {
+      return(NULL)
+    }
+    
   })
   
   
+  ########
+  ##PLOTS#
+  ########
   
-  output$distPlot <- renderPlot({
+  output$confirmed_plot <- renderPlot({
     dataset <- datasetInput()
+    plot(x = dataset[,"Date"] , 
+         y = dataset[,"Confirmed",],
+         xlab = "Day",
+         ylab = "Confirmed")
     
-    min = input$range[1]
-    max = input$range[2]
-    today = ncol(dataset)
-    part  <- dataset[dataset$Country.Region == input$country,(today + min): (today +max)]
-    plot(t(as.matrix(part)))
+  })
+  
+  output$recovered_plot <- renderPlot({
+    dataset <- datasetInput()
+    plot(x = dataset[,"Date"] , 
+         y = dataset[,"Recovered",],
+         xlab = "Day",
+         ylab = "Recovered")
+    
+  })
+  
+  output$deaths_plot <- renderPlot({
+    dataset <- datasetInput()
+    plot(x = dataset[,"Date"] , 
+         y = dataset[,"Deaths",],
+         xlab = "Day",
+         ylab = "Deaths")
+    
+  })
+  
+  output$confirmed_growth_plot <- renderPlot({
+    dataset <- datasetInput()
+    plot(x = dataset[,"Date"] , 
+         y = dataset[,"ConfirmedGrowthRate",],
+         xlab = "Day",
+         ylab = "Confirmed Growth Rate")
+    
+  })
+  
+  output$recovered_growth_plot <- renderPlot({
+    dataset <- datasetInput()
+    plot(x = dataset[,"Date"] , 
+         y = dataset[,"RecoveredGrowthRate",],
+         xlab = "Day",
+         ylab = "Recovered Growth Rate")
+    
+  })
+  
+  output$deaths_growth_plot <- renderPlot({
+    dataset <- datasetInput()
+    plot(x = dataset[,"Date"] , 
+         y = dataset[,"DeathsGrowthRate",],
+         xlab = "Day",
+         ylab = "Deaths Growth Rate")
+    
   })
   
   
-## SECOND TAB 
-  
-  output$home <- renderInfoBox({
-    num  <- italy[italy$denominazione_regione == input$regChosenITA , "isolamento_domiciliare"]
-    infoBox(
-      "At home, isolated: ", num, icon = icon("list"),
-      color = "navy"
-    )
-  })
-  output$hospitalized <- renderInfoBox({
-    num  <- italy[italy$denominazione_regione == input$regChosenITA , "totale_ospedalizzati"]
-    infoBox(
-      "Hospitalized: ", num, icon = icon("list"),
-      color = "aqua"
-    )
-  })
-  
-  # Same as above, but with fill=TRUE
-  output$intensive <- renderInfoBox({
-    num  <- italy[italy$denominazione_regione == input$regChosenITA , "terapia_intensiva"]
-    infoBox(
-      "Intensive Care: ", num, icon = icon("list"),
-      color = "purple", fill = TRUE
-    )
-  })
-  output$confirmed <- renderInfoBox({
-    num  <- italy[italy$denominazione_regione == input$regChosenITA , "totale_attualmente_positivi"]
-    infoBox(
-      "Confirmed Positive: ", num , icon = icon("list"),
-      color = "yellow", fill = TRUE
-    )
-  })
-  
-  output$recovered <- renderInfoBox({
-    num  <- italy[italy$denominazione_regione == input$regChosenITA , "dimessi_guariti"]
-    infoBox(
-      "Recovered: ", num, icon = icon("list"),
-      color = "green", fill = TRUE
-    )
-  })
-  
-  output$deaths <- renderInfoBox({
-    num  <- italy[italy$denominazione_regione == input$regChosenITA , "deceduti"]
-    infoBox(
-      "Deaths: ", num, icon = icon("list"),
-      color = "orange", fill = TRUE
-    )
-  })
-  
-  output$tests <- renderInfoBox({
-    num  <- italy[italy$denominazione_regione == input$regChosenITA , "tamponi"]
-    infoBox(
-      "Total of tests: ", num, icon = icon("list"),
-      color = "blue", fill = TRUE
-    )
-  })
-  
-  output$total <- renderInfoBox({
-    num  <- italy[italy$denominazione_regione == input$regChosenITA , "totale_casi"]
-    infoBox(
-      "Total of cases: ",num, icon = icon("list"),
-      color = "red", fill = TRUE
-    )
-  })
 }
 
 
