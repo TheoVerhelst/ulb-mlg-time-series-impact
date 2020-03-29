@@ -203,17 +203,15 @@ ui <- dashboardPage(
   )))
 )
 
-
-
 server <- function(input, output) {
-  #slice exact part of dataset
+  # slice exact part of dataset
   datasetInput <- reactive({
     min_date = Sys.Date() + input$range[1]
     max_date = Sys.Date() + input$range[2]
     
     
     if (!is.null(input$region)) {
-      #we assume Region names are unique
+      # we assume Region names are unique
       return(global_data[(global_data$Province.State == input$region) &
                            (global_data$Date >= min_date) &
                            (global_data$Date <= max_date), ])
@@ -225,7 +223,20 @@ server <- function(input, output) {
                            (global_data$Date <= max_date), ])
       
     }
-    
+  })
+  
+  
+  make_plot <- function(colname, allow_log) renderPlot({
+    dataset <- datasetInput()
+    plot(
+      x = dataset[, "Date"] ,
+      y = dataset[, colname],
+      type = "l",
+      xlab = "Day",
+      ylab = colname,
+      log = ifelse(input$log_scale_world & allow_log, "y", "")
+    )
+    # abline(v = as.Date("2020/03/20"))
   })
   
   ## Render the region selector if a country with regions is chosen
@@ -247,81 +258,12 @@ server <- function(input, output) {
   ##PLOTS#
   ########
   
-  output$confirmed_plot <- renderPlot({
-    dataset <- datasetInput()
-    plot(
-      x = dataset[, "Date"] ,
-      y = dataset[, "Confirmed"],
-      type = "l",
-      xlab = "Day",
-      ylab = "Confirmed",
-      log = ifelse(input$log_scale_world, "y", "")
-    )
-    # abline(v = as.Date("2020/03/20"))
-  })
-  
-  output$recovered_plot <- renderPlot({
-    dataset <- datasetInput()
-    plot(
-      x = dataset[, "Date"] ,
-      y = dataset[, "Recovered"],
-      type = "l",
-      xlab = "Day",
-      ylab = "Recovered",
-      log = ifelse(input$log_scale_world, "y", "")
-    )
-    
-  })
-  
-  output$deaths_plot <- renderPlot({
-    dataset <- datasetInput()
-    plot(
-      x = dataset[, "Date"] ,
-      y = dataset[, "Deaths"],
-      type = "l",
-      xlab = "Day",
-      ylab = "Deaths",
-      log = ifelse(input$log_scale_world, "y", "")
-    )
-    
-  })
-  
-  output$confirmed_growth_plot <- renderPlot({
-    dataset <- datasetInput()
-    plot(
-      x = dataset[, "Date"] ,
-      y = dataset[, "ConfirmedGrowthRate"],
-      type = "l",
-      xlab = "Day",
-      ylab = "Confirmed Growth Rate"
-    )
-    
-  })
-  
-  output$recovered_growth_plot <- renderPlot({
-    dataset <- datasetInput()
-    plot(
-      x = dataset[, "Date"] ,
-      y = dataset[, "RecoveredGrowthRate"],
-      type = "l",
-      xlab = "Day",
-      ylab = "Recovered Growth Rate"
-    )
-    
-  })
-  
-  output$deaths_growth_plot <- renderPlot({
-    dataset <- datasetInput()
-    plot(
-      x = dataset[, "Date"] ,
-      y = dataset[, "DeathsGrowthRate"],
-      type = "l",
-      xlab = "Day",
-      ylab = "Deaths Growth Rate"
-    )
-    
-  })
-  
+  output$confirmed_plot <- make_plot("Confirmed", allow_log = TRUE)
+  output$recovered_plot <- make_plot("Recovered", allow_log = TRUE)
+  output$deaths_plot <- make_plot("Deaths", allow_log = TRUE)
+  output$confirmed_growth_plot <- make_plot("ConfirmedGrowthRate", allow_log = FALSE)
+  output$recovered_growth_plot <- make_plot("RecoveredGrowthRate", allow_log = FALSE)
+  output$deaths_growth_plot <- make_plot("DeathsGrowthRate", allow_log = FALSE)
   
   #########
   ##ITALY##
