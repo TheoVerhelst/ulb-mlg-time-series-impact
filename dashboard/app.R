@@ -91,6 +91,14 @@ world_side_panel <- sidebarPanel(
     value = 0
   )
   
+  #sliderInput(
+  #  "linear_fitting_world",
+  #  label = "Number of last days fitted",
+  #  min = 5,
+  #  max = 10,
+  #  value = 5
+  #)
+  
 )
 
 
@@ -317,8 +325,8 @@ server <- function(input, output) {
     dates_to_show_lab <- gsub("^.*?-","",dates_to_show)
     events <- unlist(action_label_dict[texts_to_show])
     days <- unlist(dates_to_show_lab)
- 
-    ggplot(as.data.frame(dataset), aes_string(x = "Date", y = stat_to_plot)) +
+    
+    p <- ggplot(as.data.frame(dataset), aes_string(x = "Date", y = stat_to_plot)) +
       geom_line() +
       geom_vline(xintercept = dates_to_show) +
       xlab("Date") +
@@ -326,6 +334,22 @@ server <- function(input, output) {
       annotate("text", x = dates_to_show, y = 0, angle = 90, vjust = 1.5, hjust=-0.5, label =  paste(events,days,sep = ":")) + 
       scale_y_continuous(trans=ifelse(input$log_scale_world & allow_log, "log10", "identity")) +
       theme_bw() 
+    
+    if (FALSE) {
+    if (colname_suffix == "GrowthRate") {
+          min_date = Sys.Date() + input$range[2] - input$linear_fitting_world - 2
+          max_date = Sys.Date() + input$range[2]
+          data_to_fit <- global_data[(global_data$Country.Region == input$country) &
+                                 (global_data$Province.State == ifelse(input$country %in% countries_with_regions, input$region, "")) &
+                                 (global_data$Date >= min_date) &
+                                 (global_data$Date <= max_date),]
+          fitted <- lm(formula = paste(stat_to_plot, "~ Date"), data = data_to_fit)
+          date_p_val <- summary(fitted)$coefficients["Date", 4]
+          predicted <- data.frame(predicted = predict(fitted, newdata = data_to_fit["Date"]), Date = data_to_fit["Date"])
+          p <- p + geom_line(data = predicted, aes(x = Date, y = predicted))
+    }
+    }
+    p
   })
   
   ########
