@@ -1,0 +1,12 @@
+name: dashboard
+title: dashboard
+username:
+account: gbonte
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2020928
+bundleId: 2944220
+url: https://gbonte.shinyapps.io/dashboard/
+when: 1585580507.04233
+asMultiple: FALSE
+asStatic: FALSE

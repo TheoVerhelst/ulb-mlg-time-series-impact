@@ -113,13 +113,6 @@ world_side_panel <- sidebarPanel(
   
   radioButtons("dates", "Show a special date:", unlist(action_label_dict_rev)),
   
-  sliderInput(
-    "smooth_growth_rate_world",
-    label = "Degree of growth-rate smoothing: (WORK IN PROGRESS)",
-    min = 0,
-    max = 10,
-    value = 0
-  ),
   
   sliderInput(
     "clusters",
@@ -275,7 +268,7 @@ ranking_main_panel <- mainPanel(
 
 
 ui <- dashboardPage(
-  dashboardHeader(title = "COVID-19 Impact of Polices", titleWidth = 350),
+  dashboardHeader(title = "COVID-19 Impact of Policies", titleWidth = 350),
     dashboardSidebar(width = 125, sidebarMenu(
     menuItem("World", tabName = "world", icon = icon("bar-chart-o")),
     menuItem("Italy", tabName = "italy", icon = icon("bar-chart-o")),
