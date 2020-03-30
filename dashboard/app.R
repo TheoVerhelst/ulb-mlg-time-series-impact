@@ -83,6 +83,9 @@ TS_CLUST_DISTANCES <- c(RAWDATA_BASED,
                         PREDICTION_BASED,
                         WAVELET_BASED)
 
+# To use together with the function format, on dates
+date_format <- "%b %d"
+
 
 world_side_panel <- sidebarPanel(
   selectInput(
@@ -436,7 +439,7 @@ server <- function(input, output) {
     texts_to_show <- texts_to_show[!is.na(dates_to_show)]
     dates_to_show <- dates_to_show[!is.na(dates_to_show)]
     
-    dates_to_show_lab <- gsub("^.*?-","",dates_to_show)
+    dates_to_show_lab <- format(dates_to_show, date_format)
     events <- unlist(action_label_dict[texts_to_show])
     days <- unlist(dates_to_show_lab)
  
@@ -460,7 +463,7 @@ server <- function(input, output) {
       geom_vline(xintercept = dates_to_show) +
       xlab("Date") +
       ylab(stat_to_plot) +
-      annotate("text", x = dates_to_show, y = 0, angle = 90, vjust = 1.5, hjust=-0.5, label =  paste(events,days,sep = ":")) + 
+      annotate("text", x = dates_to_show, y = 0, angle = 90, vjust = 1.5, hjust=-0.5, label =  paste(events, days, sep = ": ")) + 
       scale_y_continuous(trans=ifelse(input$log_scale_world & allow_log, "log10", "identity")) +
       theme_bw()
     
@@ -483,7 +486,11 @@ server <- function(input, output) {
           date_coef <- summary(fitted)$coefficients["Date", 1]
           intercept <- summary(fitted)$coefficients["(Intercept)", 1]
           root <- as.Date(-intercept / date_coef)
-          root_text <- ifelse(is.finite(root), paste("growth rate null on", format(root, "%D")), "growth rate increases")
+          if (is.finite(root) & date_coef < 0) {
+            root_text <- paste("growth rate null on", format(root, date_format))
+          } else {
+            root_text <- "growth rate increases"
+          }
           
           p <- p +
             geom_line(data = predicted, aes(x = Date, y = predicted), color = "red", size = 1.5) +
@@ -531,6 +538,7 @@ server <- function(input, output) {
         (italian_data$Province.State == input$italy_region) &
           (italian_data$Date >= min_date) &
           (italian_data$Date <= max_date),]
+      data_to_fit <- data_to_fit[!is.na(data_to_fit[,stat_to_plot]),]
       if (nrow(data_to_fit) > 3) {
         fitted <- lm(formula = paste(stat_to_plot, "~ Date"), data = data_to_fit)
         date_p_val <- summary(fitted)$coefficients["Date", 4]
@@ -540,7 +548,12 @@ server <- function(input, output) {
         date_coef <- summary(fitted)$coefficients["Date", 1]
         intercept <- summary(fitted)$coefficients["(Intercept)", 1]
         root <- as.Date(-intercept / date_coef)
-        root_text <- ifelse(is.finite(root), paste("growth rate null on", format(root, "%D")), "growth rate increases")
+        if (is.finite(root) & date_coef < 0) {
+          root_text <- paste("growth rate null on", format(root, date_format))
+        } else {
+          root_text <- "growth rate increases"
+        }
+        
         
         p <- p +
           geom_line(data = predicted, aes(x = Date, y = predicted), color = "red", size = 1.5) +
