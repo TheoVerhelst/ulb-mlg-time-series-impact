@@ -282,10 +282,12 @@ server <- function(input, output) {
     dataset <- dataset_by_action_input()
     dataset <- dataset[dataset$Action == as.character(input$dates),]
     stat_to_plot <- paste0(input$world_stat, "GrowthRate")
-    
-    ggplot(dataset, aes_string(x = "BeforeAction", color = "BeforeAction", y = stat_to_plot)) + 
-      geom_boxplot() +
+    ggplot(dataset, aes_string(x = "BeforeAction", color="BeforeAction", y = stat_to_plot)) + 
+      geom_boxplot(show.legend = FALSE) +
       scale_color_brewer(type = "qual", palette = 2) +
+      xlab("Comparison before and after the action") +
+      ylab("Growth Rate distribution")+
+      scale_x_discrete(labels=c("Before the action","After the action"))+
       theme_bw()
   })
   
