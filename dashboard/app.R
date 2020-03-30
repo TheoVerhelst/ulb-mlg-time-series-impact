@@ -114,6 +114,14 @@ world_side_panel <- sidebarPanel(
   radioButtons("dates", "Show a special date:", unlist(action_label_dict_rev)),
   
   sliderInput(
+    "smooth_growth_rate_world",
+    label = "Degree of growth-rate smoothing:",
+    min = 0,
+    max = 5,
+    value = 0
+  ),
+  
+  sliderInput(
     "linear_fitting_world",
     label = "Number of last days fitted",
     min = 5,
@@ -377,6 +385,21 @@ server <- function(input, output) {
     events <- unlist(action_label_dict[texts_to_show])
     days <- unlist(dates_to_show_lab)
  
+    if (colname_suffix == "GrowthRate"){
+      dataset$smooth <- dataset[, stat_to_plot]
+      dataset[(is.na(dataset[,"smooth"])) |(is.infinite(dataset[,"smooth"])), "smooth"] <- 0
+
+      w <- 2*input$smooth_growth_rate_world
+      if (w >= 2){
+        for (i in seq(1:nrow(dataset))){
+          if (i <= w/2) dataset[i,"smooth"] <- mean(dataset[i:i+w, stat_to_plot])
+          if ((i > w/2) && (i<nrow(dataset)-(w/2))) dataset[i,"smooth"] <- mean(dataset[i-(w/2):i+(w/2), stat_to_plot])
+          if (i >= nrow(dataset)-(w/2)) dataset[i,"smooth"] <- mean(dataset[i-w:i, stat_to_plot])
+        }
+      }
+
+    }
+    
     p <- ggplot(as.data.frame(dataset), aes_string(x = "Date", y = stat_to_plot)) +
       geom_line() +
       geom_vline(xintercept = dates_to_show) +
@@ -386,7 +409,9 @@ server <- function(input, output) {
       scale_y_continuous(trans=ifelse(input$log_scale_world & allow_log, "log10", "identity")) +
       theme_bw()
     
+    
     if (colname_suffix == "GrowthRate") {
+        p <- p + geom_line(as.data.frame(dataset), mapping = aes_string(x = "Date", y = "smooth"), color = "blue")
         min_date = Sys.Date() + input$range[2] - input$linear_fitting_world - 2
         max_date = Sys.Date() + input$range[2]
         data_to_fit <- global_data[(global_data$Country.Region == input$country) &
