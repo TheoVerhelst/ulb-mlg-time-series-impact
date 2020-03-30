@@ -94,6 +94,7 @@ compute_t_statistic <- function(actions.df, value_column) {
     }
   })
   pairs$t.value <- sapply(test_results, function(res) ifelse(is.null(res), NA, res$statistic))
+  pairs$delta <- sapply(test_results, function(res) ifelse(is.null(res), NA, res$estimate))
   pairs$p.value <- sapply(test_results, function(res) ifelse(is.null(res), NA, res$p.value))
   pairs <- pairs[!is.na(pairs$t.value),]
   for (action in unique(pairs$Action)) {

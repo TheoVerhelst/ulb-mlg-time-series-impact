@@ -187,7 +187,12 @@ italy_main_panel <- mainPanel(column(
 
 
 ranking_side_panel <- sidebarPanel(
-  radioButtons("ranking_date", "Confinement action used in ranking", unlist(action_label_dict_rev))
+  radioButtons("ranking_date", "Confinement action used in ranking", unlist(action_label_dict_rev)),
+  helpText(
+    "In this section, a t-test is performed to assess the difference between the
+    distribution of the growth rate of confirmed cases, before and after
+    an action is taken. We report here the resulting statistic, the p-value and the delta between the means."
+  )
 )
 
 
@@ -204,7 +209,7 @@ ranking_main_panel <- mainPanel(
 
 
 ui <- dashboardPage(
-  dashboardHeader(title = "CODE VS COVID19"),
+  dashboardHeader(title = "COVID-19 Impact of Polices"),
     dashboardSidebar(sidebarMenu(
     menuItem("World", tabName = "world", icon = icon("bar-chart-o")),
     menuItem("Italy", tabName = "italy", icon = icon("bar-chart-o")),
@@ -414,7 +419,7 @@ server <- function(input, output) {
     t_stat <- t_stat[!is.na(t_stat$t.value),]
     ggplot(t_stat, aes(x = reorder(Country.Region, t.value, sum), y = t.value)) +
       geom_col(fill = "lightblue") +
-      geom_text(aes(label = paste("p =", prettyNum(p.value.adj))), position = position_stack(vjust = .5)) +
+      geom_text(aes(label = paste("p =", prettyNum(p.value.adj), ", delta =", format(delta, digits = 2))), position = position_stack(vjust = .5)) +
       coord_flip() +
       xlab("Country") +
       ylab("T-test statistic (with adjusted p-value)") +
