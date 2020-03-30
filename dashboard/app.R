@@ -143,7 +143,9 @@ world_main_panel <- mainPanel(
            plotOutput("change_point_plot")
          ),
          wellPanel(
-           helpText("")
+           helpText("We employ an algorithm (based on the R package changepoints) to detect a shift in the distribution of the data.
+                    The algorithm assumes a prior normal distribution of the data, and finds the optimal number of change points
+                    (in terms of mean and variance), based on a binary segmentation algorithm (Scott and Knott (1974)).")
          )
        )
     )
