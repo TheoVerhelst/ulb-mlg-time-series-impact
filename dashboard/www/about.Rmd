@@ -14,11 +14,12 @@ This dashboard is the participation of the Machine Learning Group from the Unive
 
 ## The Team
 
-* Gianluca Bontempi (gbonte@ulb.ac.be): Mentor
 * Théo Verhelst (tverhels@ulb.ac.be): Team lead
 * Jacopo (jdestefa@ulb.ac.be): Data preprocessing and analysis
 * Gian Marco Paldino (gpaldino@ulb.ac.be): Shiny Dashboard
 * Elias Fernández (eliferna@vub.be): Data preprocessing & literature research
+* Mattia Bontempi: Data collection
+* Gianluca Bontempi (gbonte@ulb.ac.be): Mentor
 
 ## The Code
 The code of this dashboard is open-source and available on [GitHub](https://github.com/TheoVerhelst/ulb-mlg-time-series-impact).
