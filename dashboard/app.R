@@ -272,10 +272,9 @@ ranking_main_panel <- mainPanel(
 )
 
 
-
 ui <- dashboardPage(
-  dashboardHeader(title = "COVID-19 Impact of Polices"),
-    dashboardSidebar(sidebarMenu(
+  dashboardHeader(title = "COVID-19 Impact of Polices", titleWidth = 350),
+    dashboardSidebar(width = 125, sidebarMenu(
     menuItem("World", tabName = "world", icon = icon("bar-chart-o")),
     menuItem("Italy", tabName = "italy", icon = icon("bar-chart-o")),
     menuItem("Ranking", tabName = "ranking", icon = icon("bar-chart-o")),
