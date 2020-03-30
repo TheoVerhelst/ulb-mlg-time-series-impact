@@ -140,6 +140,9 @@ world_main_panel <- mainPanel(
            solidHeader = TRUE,
            status = "primary",
            plotOutput("change_point_plot")
+         ),
+         wellPanel(
+           helpText("")
          )
        )
     )
@@ -214,7 +217,8 @@ ui <- dashboardPage(
     dashboardSidebar(sidebarMenu(
     menuItem("World", tabName = "world", icon = icon("bar-chart-o")),
     menuItem("Italy", tabName = "italy", icon = icon("bar-chart-o")),
-    menuItem("Ranking", tabName = "ranking", icon = icon("bar-chart-o"))
+    menuItem("Ranking", tabName = "ranking", icon = icon("bar-chart-o")),
+    menuItem("About", tabName = "about", icon = icon("question"))
   )),
   
   ## Body content
@@ -228,7 +232,14 @@ ui <- dashboardPage(
             italy_main_panel),
     tabItem(tabName = "ranking",
             ranking_side_panel,
-            ranking_main_panel)
+            ranking_main_panel),
+    tabItem(tabName = "about",
+            fluidPage(
+                   tags$iframe(src = './about.html', 
+                               width = '100%', height = '800px',
+                               frameborder = 0, scrolling = 'auto'
+                   )
+              ))
   )))
 )
 

@@ -1,0 +1,24 @@
+---
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# COVID-19 Causal Analysis of confinement actions
+### CodeVsCovid19 Hackathon participation
+
+This dashboard is the participation of the Machine Learning Group from the Université Libre de Bruxelles (MLG-ULB, [mlg.ulb.ac.be](http://mlg.ulb.ac.be)) to the hackaton CodeVsCovid19 ([www.codevscovid19.org](http://www.codevscovid19.org)). It provides a detailed analysis of the effect of government policies on the evolution of the COVID-19 disease.
+
+## The Team
+
+* Gianluca Bontempi (gbonte@ulb.ac.be): Mentor
+* Théo Verhelst (tverhels@ulb.ac.be): Team lead
+* Jacopo (jdestefa@ulb.ac.be): Data preprocessing and analysis
+* Gian Marco Paldino (gpaldino@ulb.ac.be): Shiny Dashboard
+* Elias Fernández (eliferna@vub.be): Data preprocessing & literature research
+
+## The Code
+The code of this dashboard is open-source and available on [GitHub](https://github.com/TheoVerhelst/ulb-mlg-time-series-impact).
