@@ -408,12 +408,15 @@ server <- function(input, output) {
   })
   
   make_help <- function() renderUI({
-    if(sum((info_data$Country.Region == input$country) && 
-           (info_data$Province.State == ifelse(input$country %in% countries_with_regions, input$region, ""))) == 0){
-      helpText("Selected Date is not available for the specified country")
-    } else{
-        return(NULL)
-      }
+    relevant_row <- (info_data$Country.Region == input$country) &
+           (info_data$Province.State == ifelse(input$country %in% countries_with_regions, input$region, ""))
+    if(sum(relevant_row) == 0) {
+      HTML("<strong style='color:red'>Selected Date is not available for the specified country</strong>")
+    } else if (is.na(info_data[relevant_row, input$dates])) {
+      HTML("<strong style='color:red'>Selected Date is not available for the specified country</strong>")
+    } else {
+      return(NULL)
+    }
   })
   
   ## Render the help text panel 1 if a date with NA is chosen
@@ -470,6 +473,7 @@ server <- function(input, output) {
                                (global_data$Province.State == ifelse(input$country %in% countries_with_regions, input$region, "")) &
                                (global_data$Date >= min_date) &
                                (global_data$Date <= max_date),]
+        data_to_fit <- data_to_fit[!is.na(data_to_fit[,stat_to_plot]),]
         if (nrow(data_to_fit) > 3) {
           fitted <- lm(formula = paste(stat_to_plot, "~ Date"), data = data_to_fit)
           date_p_val <- summary(fitted)$coefficients["Date", 4]
