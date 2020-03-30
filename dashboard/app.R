@@ -3,6 +3,10 @@ library(dplyr)
 library(shiny)
 library(shinydashboard)
 library(ggplot2)
+library(zoo)
+library(imputeTS)
+library(changepoint)
+library(changepoint.np)
 
 source("functions.R")
 
@@ -12,6 +16,10 @@ info_data <- readRDS(url(
   "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/COVID19_Country_Info.Rdata?raw=true"))
 global_data <- readRDS(url(
   "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/COVID19_Global_Italy_wGrowth.Rdata?raw=true"))
+
+stats <- c("ConfirmedGrowthRate", "DeathsGrowthRate", "RecoveredGrowthRate")
+time_series_by_stat <- lapply(stats, function(colname) setup_time_series(global_data, colname))
+names(time_series_by_stat) <- stats
 
 ##Split between Italian and Global Data##
 is_regional_italy <- (global_data$Country.Region == "Italy") & (global_data$Province.State != "")
@@ -27,7 +35,6 @@ countries_with_regions <- unique(global_data[global_data$Province.State != "", "
 statistics_italy <- names(global_data)[6:15]
 statistics_global <- names(global_data)[6:8]
 italian_regions <- unique(italian_data["Province.State"])
-
 
 
 
@@ -127,7 +134,20 @@ world_main_panel <- mainPanel(
            plotOutput("action_comp_plot")
          )
        )
-)
+    ),
+    
+    tabPanel("Change point detection",
+       column(
+         width = 12,
+         box(
+           title = "Detection of change point",
+           width = NULL,
+           solidHeader = TRUE,
+           status = "primary",
+           plotOutput("change_point_plot")
+         )
+       )
+    )
   )
 )
 
@@ -256,7 +276,7 @@ server <- function(input, output) {
     dataset <- datasetInput()
     country_info <- get_country_info()
     
-      texts_to_show <- as.character(input$dates)
+    texts_to_show <- as.character(input$dates)
     dates_to_show <- do.call("c", lapply(texts_to_show, function(col) country_info[, col]))
     
     # Remove NAs to avoid a warning
@@ -290,6 +310,63 @@ server <- function(input, output) {
       geom_boxplot() +
       scale_color_brewer(type = "qual", palette = 2) +
       theme_bw()
+  })
+  
+  
+  
+  output$change_point_plot <- renderPlot({
+    # Select the right statistic
+    to_plot.ts <- time_series_by_stat[paste0(input$world_stat, "GrowthRate")][[1]]
+    # Select the right country
+    country_pair <- paste0(input$country, "_", ifelse(input$country %in% countries_with_regions, input$region, ""))
+    to_plot.ts <- to_plot.ts[,country_pair]
+    # Select the right date range
+    min_date = Sys.Date() + input$range[1]
+    max_date = Sys.Date() + input$range[2]
+    to_plot.ts <- to_plot.ts[(index(to_plot.ts) >= min_date) & (index(to_plot.ts) <= max_date)]
+    to_plot.ts <- to_plot.ts[!is.na(to_plot.ts)]
+    to_plot.ts <- to_plot.ts[is.finite(to_plot.ts)]
+    to_plot.df <- data.frame(Date = index(to_plot.ts), Value = coredata(to_plot.ts))
+    
+    # Show lines with important dates
+    country_info <- get_country_info()
+    texts_to_show <- as.character(input$dates)
+    dates_to_show <- do.call("c", lapply(texts_to_show, function(col) country_info[, col]))
+    # Remove NAs to avoid a warning
+    texts_to_show <- texts_to_show[!is.na(dates_to_show)]
+    dates_to_show <- dates_to_show[!is.na(dates_to_show)]
+    
+    p <- ggplot(to_plot.df, aes(x = Date, y = Value)) +
+      geom_line() +
+      geom_vline(xintercept = dates_to_show) +
+      xlab("Date") +
+      ylab(paste(input$world_stat, "growth rate")) +
+      annotate("text", x = dates_to_show, y = 0, angle = 90, vjust = 1.5, hjust=-1.5, label = unlist(action_label_dict[texts_to_show])) +
+      theme_bw()
+    
+    # Compute change point detection
+    Q <- 10
+    if (length(to_plot.ts) > Q) {
+      to_plot.cpt <- cpt.meanvar(to_plot.ts, test.stat='Normal', method='BinSeg', Q=Q, penalty="SIC")
+      changepoints <- cpts(to_plot.cpt)
+      # Plot them if there is any change point at all
+      if (length(changepoints) > 0) {
+        means_cp <- sapply(1:length(changepoints), function(i)
+            mean(to_plot.ts[ifelse(i == 1, 1, changepoints[i - 1]):changepoints[i]]))
+        means_cp <- c(means_cp, mean(to_plot.ts[tail(changepoints, 1):length(to_plot.ts)]))
+        endpoint_cp_date <- c(index(to_plot.ts)[changepoints], tail(index(to_plot.ts), 1))
+        segments.df <- data.frame(
+            x=c(index(to_plot.ts)[1], endpoint_cp_date[1:length(endpoint_cp_date) - 1]),
+            xend=endpoint_cp_date,
+            y=means_cp,
+            yend=means_cp)
+        
+        p <- p  + geom_segment(data = segments.df,
+           aes(x = x, xend = xend, y = y, yend = yend),
+           color="blue")
+      }
+    }
+    p
   })
   
   #########

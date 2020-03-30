@@ -76,3 +76,21 @@ compute_z_statistic <- function(actions.df, value_column) {
   
   return(results[, c("Country.Region", "Province.State", "Action", "Z", "p.value", "p.value.adj")])
 }
+
+
+split_data <- function(province_country_pair, data.df) {
+  data.df[data.df$Country.Region == province_country_pair[1] &
+          data.df$Province.State == province_country_pair[2],]
+}
+
+setup_time_series <- function(global_data, value_column) {
+  unique_pairs.df <- unique(global_data[,c("Country.Region", "Province.State")])
+  unique_pairs.list <- mapply(c, unique_pairs.df$Country.Region, unique_pairs.df$Province.State, SIMPLIFY = FALSE)
+  split_data.list <- lapply(unique_pairs.list, split_data, global_data)
+  cases_gr_ts.list <- lapply(split_data.list,
+                                 function(data.df) {zoo(data.df[,c(value_column)],
+                                                        order.by = data.df$Date)})
+  cases_gr_ts.zoo <- Reduce(merge, cases_gr_ts.list)
+  colnames(cases_gr_ts.zoo) <- lapply(unique_pairs.list, paste, collapse="_")
+  return(cases_gr_ts.zoo)
+}
