@@ -22,3 +22,8 @@ This dashboard is the participation of the Machine Learning Group from the Unive
 
 ## The Code
 The code of this dashboard is open-source and available on [GitHub](https://github.com/TheoVerhelst/ulb-mlg-time-series-impact).
+
+## Data Sources
+* Global time series: [JHU CSSE](https://github.com/CSSEGISandData/COVID-19)
+* Italy time series: [Presidenza del Consiglio dei Ministri - Dipartimento della Protezione Civile](https://github.com/pcm-dpc/COVID-19)
+* Country policy dates: [a Kaggle dataset](https://www.kaggle.com/koryto/countryinfo)
