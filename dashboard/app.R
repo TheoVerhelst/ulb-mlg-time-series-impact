@@ -36,6 +36,10 @@ statistics_italy <- names(global_data)[6:15]
 statistics_global <- names(global_data)[6:8]
 italian_regions <- unique(italian_data["Province.State"])
 
+european_countries <- c("Austria","Belgium","Bulgaria","Croatia","Cyprus","Czechia",
+                        "Denmark","Estonia","Finland","Germany","Greece",
+                        "Hungary","Ireland","Italy","Latvia","Lithuania","Luxembourg","Malta",
+                        "Netherlands","Poland","Portugal","Romania","Slovakia","Slovenia","Spain","Sweden")
 
 
 action_label_dict <- list("Date.Schools" = "Schools closure",
@@ -52,6 +56,30 @@ names(action_label_dict_rev) <- unname(action_label_dict)
 stat_label_dict <- c("Confirmed cases" = "Confirmed",
                     "Deaths" = "Deaths",
                     "Recovered" = "Recovered")
+
+
+RAWDATA_BASED <- c("DTWARP", "FRECHET", "EUCL")
+AUTOCORRELATION_BASED <- c("ACF", "PACF")
+CORRELATION_BASED <- c("COR")
+PROXIMITYVALUE_BASED <- c("CORT")
+PERIODOGRAM_BASED <- c("PER", "INT.PER")
+SPECTRAL_BASED <- c("SPEC.LLR", "SPEC.GLK", "SPEC.ISD")
+MODEL_BASED <- c("AR.MAH", "AR.PIC", "AR.LPC.CEPS")
+COMPLEXITY_BASED <- c("PDC","CDM","CID", "NCD")
+SYMBOLIC_BASED <- c("MINDIST.SAX")
+PREDICTION_BASED <- c("PRED")
+WAVELET_BASED <- c("DWT")
+TS_CLUST_DISTANCES <- c(RAWDATA_BASED,
+                        AUTOCORRELATION_BASED,
+                        CORRELATION_BASED,
+                        PROXIMITYVALUE_BASED,
+                        PERIODOGRAM_BASED,
+                        SPECTRAL_BASED,
+                        MODEL_BASED,
+                        COMPLEXITY_BASED,
+                        SYMBOLIC_BASED,
+                        PREDICTION_BASED,
+                        WAVELET_BASED)
 
 
 world_side_panel <- sidebarPanel(
@@ -89,6 +117,22 @@ world_side_panel <- sidebarPanel(
     min = 0,
     max = 10,
     value = 0
+  ),
+  
+  sliderInput(
+    "clusters",
+    label = "Clusters: (only for TS clustering)",
+    min = 2,
+    max = length(european_countries),
+    value = 2,
+    step = 1
+  ),
+  
+  selectInput(
+    inputId = "clustering_distance",
+    label = "Choose a clustering distance: (Only for TS clustering)",
+    choices = TS_CLUST_DISTANCES,
+    selected = TS_CLUST_DISTANCES[4]
   )
   
 )
@@ -148,6 +192,20 @@ world_main_panel <- mainPanel(
                     (in terms of mean and variance), based on a binary segmentation algorithm (Scott and Knott (1974)).")
          )
        )
+    ),
+    
+    tabPanel("Time series clustering",
+             column(
+               width = 12,
+               uiOutput("help_text_panel4"),
+               box(
+                 title = "Time series clustering",
+                 width = NULL,
+                 solidHeader = TRUE,
+                 status = "primary",
+                 plotOutput("ts_cluster_plot",width = "100%")
+               )
+             )
     )
   )
 )
@@ -404,6 +462,50 @@ server <- function(input, output) {
       }
     }
     p
+  })
+  
+  output$ts_cluster_plot <- renderPlot({
+    # Select the right statistic
+    to_plot.ts <- time_series_by_stat[paste0(input$world_stat, "GrowthRate")][[1]]
+    # Select the right country
+    selected_countries <- grepl(paste0(european_countries,sep="_$",collapse="|"),
+                                colnames(to_plot.ts))
+    to_plot.ts <- to_plot.ts[,selected_countries]
+    # Select the right date range
+    min_date = Sys.Date() + input$range[1]
+    max_date = Sys.Date() + input$range[2]
+    to_plot.ts <- to_plot.ts[(index(to_plot.ts) >= min_date) & (index(to_plot.ts) <= max_date)]
+    # to_plot.ts <- to_plot.ts[!is.na(to_plot.ts)]
+    # to_plot.ts <- to_plot.ts[is.finite(to_plot.ts)]
+    to_plot.df <- data.frame(Date = index(to_plot.ts), Value = coredata(to_plot.ts))
+    
+    # Compute distance matrix
+    to_plot.ts[which(!is.finite(to_plot.ts))] <- 0
+    to_plot.dm <- diss(data.frame(to_plot.ts),input$clustering_distance) # distance matrix
+    to_plot.dm[is.na(to_plot.dm)] <- max(to_plot.dm,na.rm = T) + 1
+    
+    # Compute clustering
+    to_plot.hclust <- hclust(to_plot.dm, method="ward.D")
+    
+    # Cut dendrogram to find clusters
+    to_plot_clusters <- data.frame(cutree(to_plot.hclust, k = input$clusters))
+    colnames(to_plot_clusters) <- c("Cluster")
+    to_plot_clusters$Series <- rownames(to_plot_clusters)
+    
+    p <- ggplot(merge(fortify(to_plot.ts,melt=T),to_plot_clusters),
+                aes(x=Index,y=Value,color=Series)) +
+      geom_line() +
+      facet_grid(Cluster ~ ., labeller=label_both) +
+      scale_x_date(labels = date_format("%m/%d"),
+                   breaks=date_breaks("days")) +
+      labs(y=paste(input$world_stat, "Growth Rate"),
+           x="Time",title="European Countries") +
+      theme_bw() +
+      theme(legend.position = 'bottom',
+            axis.text.x = element_text(angle=45))
+    
+    p
+    
   })
   
   #########
