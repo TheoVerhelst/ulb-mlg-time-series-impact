@@ -5,6 +5,8 @@ library(shinydashboard)
 library(ggplot2)
 library(zoo)
 library(imputeTS)
+library(scales)
+library(TSclust)
 library(changepoint)
 library(changepoint.np)
 
