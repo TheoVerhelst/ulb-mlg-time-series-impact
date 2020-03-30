@@ -77,6 +77,31 @@ compute_z_statistic <- function(actions.df, value_column) {
   return(results[, c("Country.Region", "Province.State", "Action", "Z", "p.value", "p.value.adj")])
 }
 
+compute_t_statistic <- function(actions.df, value_column) {
+  actions.df <- actions.df[actions.df$Province.State == "",]
+  pairs <- unique(actions.df[,c("Action", "Country.Region")])
+  test_results <- lapply(1:nrow(pairs), function(i) {
+    x <- actions.df[actions.df$Action == pairs[i, "Action"]
+                      & actions.df$Country.Region == pairs[i, "Country.Region"]
+                      & actions.df$BeforeAction, value_column]
+    y <- actions.df[actions.df$Action == pairs[i, "Action"]
+                      & actions.df$Country.Region == pairs[i, "Country.Region"]
+                      & !actions.df$BeforeAction, value_column]
+    if (length(x) > 5 & length(y) > 5) {
+      return(t.test(x = x, y = y, alternative = "greater"))
+    } else {
+      return(NULL)
+    }
+  })
+  pairs$t.value <- sapply(test_results, function(res) ifelse(is.null(res), NA, res$statistic))
+  pairs$p.value <- sapply(test_results, function(res) ifelse(is.null(res), NA, res$p.value))
+  pairs <- pairs[!is.na(pairs$t.value),]
+  for (action in unique(pairs$Action)) {
+    pairs[pairs$Action == action, "p.value.adj"] <- p.adjust(pairs[pairs$Action == action, "p.value"])
+  }
+  return(pairs)
+}
+
 
 split_data <- function(province_country_pair, data.df) {
   data.df[data.df$Country.Region == province_country_pair[1] &

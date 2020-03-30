@@ -391,15 +391,15 @@ server <- function(input, output) {
   
   output$ranking_plot <- renderPlot({
     # ConfirmedGrowthRate is hardcoded because we have barely any data for the others
-    z_stat <- compute_z_statistic(global_data_by_action[global_data_by_action$Province.State == "",], "ConfirmedGrowthRate")
-    z_stat <- z_stat[z_stat$Action == input$ranking_date,]
-    z_stat <- z_stat[!is.na(z_stat$Z),]
-    ggplot(z_stat, aes(x = reorder(Country.Region, Z, sum), y = Z)) +
+    t_stat <- compute_t_statistic(global_data_by_action[global_data_by_action$Province.State == "",], "ConfirmedGrowthRate")
+    t_stat <- t_stat[t_stat$Action == input$ranking_date,]
+    t_stat <- t_stat[!is.na(t_stat$t.value),]
+    ggplot(t_stat, aes(x = reorder(Country.Region, t.value, sum), y = t.value)) +
       geom_col(fill = "lightblue") +
       geom_text(aes(label = paste("p =", prettyNum(p.value.adj))), position = position_stack(vjust = .5)) +
       coord_flip() +
       xlab("Country") +
-      ylab("Z statistic (with p-value)") +
+      ylab("T-test statistic (with adjusted p-value)") +
       scale_color_brewer(type = "qual", palette = 2) +
       theme_bw()
   })
