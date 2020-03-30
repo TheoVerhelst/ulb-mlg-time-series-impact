@@ -82,15 +82,8 @@ world_side_panel <- sidebarPanel(
     min = 0,
     max = 10,
     value = 0
-  ),
-  
-  sliderInput(
-    "day_split_world",
-    label = "Day analyzed (0 = last day): (WORK IN PROGRESS)",
-    min = 0,
-    max = 10,
-    value = 0
   )
+  
 )
 
 
@@ -263,12 +256,16 @@ server <- function(input, output) {
     texts_to_show <- texts_to_show[!is.na(dates_to_show)]
     dates_to_show <- dates_to_show[!is.na(dates_to_show)]
     
+    dates_to_show_lab <- gsub("^.*?-","",dates_to_show)
+    events <- unlist(action_label_dict[texts_to_show])
+    days <- unlist(dates_to_show_lab)
+ 
     ggplot(as.data.frame(dataset), aes_string(x = "Date", y = stat_to_plot)) +
       geom_line() +
       geom_vline(xintercept = dates_to_show) +
       xlab("Date") +
       ylab(stat_to_plot) +
-      annotate("text", x = dates_to_show, y = 0, angle = 90, vjust = 1.5, hjust=-1.5, label = unlist(action_label_dict[texts_to_show])) + 
+      annotate("text", x = dates_to_show, y = 0, angle = 90, vjust = 1.5, hjust=-0.5, label =  paste(events,days,sep = ":")) + 
       scale_y_continuous(trans=ifelse(input$log_scale_world & allow_log, "log10", "identity")) +
       theme_bw() 
   })
@@ -331,4 +328,3 @@ server <- function(input, output) {
 
 
 shinyApp(ui, server)
-
