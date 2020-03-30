@@ -307,7 +307,7 @@ server <- function(input, output) {
       scale_color_brewer(type = "qual", palette = 2) +
       xlab("Comparison before and after the action") +
       ylab("Growth Rate distribution")+
-      scale_x_discrete(labels=c("Before the action","After the action"))+
+      scale_x_discrete(labels=c("Before the action", "After the action"), limits = c(T, F)) +
       theme_bw()
   })
   
