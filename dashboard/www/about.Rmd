@@ -30,7 +30,7 @@ The code of this dashboard is open-source and available on [GitHub](https://gith
 * Country policy dates: [a Kaggle dataset](https://www.kaggle.com/koryto/countryinfo)
 
 ## Vote our project! 
-Like and vote on [Devpost]https://devpost.com/software/ulb-mlg-time-series-impact
+Like and vote on [Devpost](https://devpost.com/software/ulb-mlg-time-series-impact)
 
 <br />
 <br />
