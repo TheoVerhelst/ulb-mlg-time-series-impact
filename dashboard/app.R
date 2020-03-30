@@ -191,7 +191,9 @@ ranking_side_panel <- sidebarPanel(
   helpText(
     "In this section, a t-test is performed to assess the difference between the
     distribution of the growth rate of confirmed cases, before and after
-    an action is taken. We report here the resulting statistic, the p-value and the delta between the means."
+    an action is taken. We report here the resulting statistic,
+    the one-sided p-value and the difference (delta) between the means.
+    The p-values are adjusted using Holm's method."
   )
 )
 
@@ -422,7 +424,7 @@ server <- function(input, output) {
       geom_text(aes(label = paste("p =", prettyNum(p.value.adj), ", delta =", format(delta, digits = 2))), position = position_stack(vjust = .5)) +
       coord_flip() +
       xlab("Country") +
-      ylab("T-test statistic (with adjusted p-value)") +
+      ylab("T-test statistic (with adjusted p-value and mean difference)") +
       scale_color_brewer(type = "qual", palette = 2) +
       theme_bw()
   })
