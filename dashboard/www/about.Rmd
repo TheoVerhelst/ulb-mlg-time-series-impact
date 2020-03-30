@@ -27,3 +27,10 @@ The code of this dashboard is open-source and available on [GitHub](https://gith
 * Global time series: [JHU CSSE](https://github.com/CSSEGISandData/COVID-19)
 * Italy time series: [Presidenza del Consiglio dei Ministri - Dipartimento della Protezione Civile](https://github.com/pcm-dpc/COVID-19)
 * Country policy dates: [a Kaggle dataset](https://www.kaggle.com/koryto/countryinfo)
+
+
+<br />
+<br />
+
+![MLG logo](mlg.png)
+![ULB logo](ulb.jpg)
