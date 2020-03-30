@@ -134,6 +134,7 @@ world_main_panel <- mainPanel(
     tabPanel("Change point detection",
        column(
          width = 12,
+         uiOutput("help_text_panel3"),
          box(
            title = "Detection of change point",
            width = NULL,
@@ -286,24 +287,18 @@ server <- function(input, output) {
     
   })
   
+  make_help <- function() renderUI({
+    if (is.na(info_data[info_data$Country.Region == input$country ,input$dates])){
+      helpText("Selected Date is not available for the specified country")
+    } else {
+      return(NULL)
+    }
+  })
+  
   ## Render the help text panel 1 if a date with NA is chosen
-  output$help_text_panel1 <- renderUI({
-    if (is.na(info_data[info_data$Country.Region == input$country ,input$dates])){
-      helpText("Selected Date is not available for the specified country")
-    } else {
-      return(NULL)
-    }
-  })
-  
-  ## Render the help text panel 2 if a date with NA is chosen
-  output$help_text_panel2 <- renderUI({
-    if (is.na(info_data[info_data$Country.Region == input$country ,input$dates])){
-      helpText("Selected Date is not available for the specified country")
-    } else {
-      return(NULL)
-    }
-  })
-  
+  output$help_text_panel1 <- make_help()
+  output$help_text_panel2  <- make_help()
+  output$help_text_panel3  <- make_help()
   
   make_plot <- function(colname_suffix, allow_log) renderPlot({
     stat_to_plot <- paste0(input$world_stat, colname_suffix)
