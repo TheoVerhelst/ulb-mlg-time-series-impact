@@ -113,7 +113,14 @@ world_side_panel <- sidebarPanel(
   
   radioButtons("dates", "Show a special date:", unlist(action_label_dict_rev)),
   
-  
+  sliderInput(
+    "linear_fitting_world",
+    label = "Number of last days fitted",
+    min = 5,
+    max = 10,
+    value = 5
+  ),
+
   sliderInput(
     "clusters",
     label = "Clusters: (only for TS clustering)",
@@ -370,14 +377,41 @@ server <- function(input, output) {
     events <- unlist(action_label_dict[texts_to_show])
     days <- unlist(dates_to_show_lab)
  
-    ggplot(as.data.frame(dataset), aes_string(x = "Date", y = stat_to_plot)) +
+    p <- ggplot(as.data.frame(dataset), aes_string(x = "Date", y = stat_to_plot)) +
       geom_line() +
       geom_vline(xintercept = dates_to_show) +
       xlab("Date") +
       ylab(stat_to_plot) +
       annotate("text", x = dates_to_show, y = 0, angle = 90, vjust = 1.5, hjust=-0.5, label =  paste(events,days,sep = ":")) + 
       scale_y_continuous(trans=ifelse(input$log_scale_world & allow_log, "log10", "identity")) +
-      theme_bw() 
+      theme_bw()
+    
+    if (colname_suffix == "GrowthRate") {
+        min_date = Sys.Date() + input$range[2] - input$linear_fitting_world - 2
+        max_date = Sys.Date() + input$range[2]
+        data_to_fit <- global_data[(global_data$Country.Region == input$country) &
+                               (global_data$Province.State == ifelse(input$country %in% countries_with_regions, input$region, "")) &
+                               (global_data$Date >= min_date) &
+                               (global_data$Date <= max_date),]
+        if (nrow(data_to_fit) > 3) {
+          fitted <- lm(formula = paste(stat_to_plot, "~ Date"), data = data_to_fit)
+          date_p_val <- summary(fitted)$coefficients["Date", 4]
+      
+          predicted <- data.frame(predicted = predict(fitted, newdata = data_to_fit["Date"]), Date = data_to_fit["Date"])
+          
+          date_coef <- summary(fitted)$coefficients["Date", 1]
+          intercept <- summary(fitted)$coefficients["(Intercept)", 1]
+          root <- as.Date(-intercept / date_coef)
+          root_text <- ifelse(is.finite(root), paste("growth rate null on", format(root, "%D")), "growth rate increases")
+          
+          p <- p +
+            geom_line(data = predicted, aes(x = Date, y = predicted), color = "red", size = 1.5) +
+            annotate("text",
+                     x = predicted[1, "Date"], y = predicted[1, "predicted"], vjust = -1.5, hjust = 0,
+                     label =  paste("p =", format(date_p_val, digits = 2), "\n", root_text))
+        }
+    }
+    p
   })
   
   ########
