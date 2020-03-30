@@ -99,6 +99,7 @@ world_main_panel <- mainPanel(
     tabPanel("Time evolution",
        column(
          width = 12,
+		 uiOutput("help_text_panel1"),
          box(
            title = "Total cases",
            width = NULL,
@@ -119,6 +120,7 @@ world_main_panel <- mainPanel(
     tabPanel("Distribution comparison",
        column(
          width = 12,
+		 uiOutput("help_text_panel2"),
          box(
            title = "Distribution of growth rate before and after action",
            width = NULL,
@@ -248,6 +250,9 @@ server <- function(input, output) {
     return(info_data[(info_data$Country.Region == input$country) &
                          (info_data$Province.State == ifelse(input$country %in% countries_with_regions, input$region, "")),])
   }
+  ##############
+  ##RENDERINGS##
+  ##############
   
   ## Render the region selector if a country with regions is chosen
   output$region_selector <- renderUI({
@@ -261,6 +266,24 @@ server <- function(input, output) {
       return(NULL)
     }
     
+  })
+  
+  ## Render the help text panel 1 if a date with NA is chosen
+  output$help_text_panel1 <- renderUI({
+    if (is.na(info_data[info_data$Country.Region == input$country ,input$dates])){
+      helpText("Selected Date is not available for the specified country")
+    } else {
+      return(NULL)
+    }
+  })
+  
+  ## Render the help text panel 2 if a date with NA is chosen
+  output$help_text_panel2 <- renderUI({
+    if (is.na(info_data[info_data$Country.Region == input$country ,input$dates])){
+      helpText("Selected Date is not available for the specified country")
+    } else {
+      return(NULL)
+    }
   })
   
   
