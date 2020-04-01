@@ -120,7 +120,7 @@ world_side_panel <- sidebarPanel(
     "smooth_growth_rate_world",
     label = "Degree of growth-rate smoothing:",
     min = 0,
-    max = 5,
+    max = 10,
     value = 0
   ),
   
@@ -379,7 +379,7 @@ server <- function(input, output) {
         "smooth_growth_rate_italy",
         label = "Degree of growth-rate smoothing:",
         min = 0,
-        max = 0,
+        max = 10,
         value = 0
       ),
       
@@ -445,14 +445,15 @@ server <- function(input, output) {
  
     if (colname_suffix == "GrowthRate"){
       dataset$smooth <- dataset[, stat_to_plot]
-      dataset[(is.na(dataset[,"smooth"])) |(is.infinite(dataset[,"smooth"])), "smooth"] <- 0
+      dataset[(is.nan(dataset[, stat_to_plot]))|(is.infinite(dataset[, stat_to_plot])), stat_to_plot] <- 0
+      dataset[(is.nan(dataset[,"smooth"])) | (is.na(dataset[,"smooth"])) |(is.infinite(dataset[,"smooth"])), "smooth"] <- 0
 
-      w <- 2*input$smooth_growth_rate_world
-      if (w >= 2){
+      w <- input$smooth_growth_rate_world
+      if (w >= 1){
         for (i in seq(1:nrow(dataset))){
-          if (i <= w/2) dataset[i,"smooth"] <- mean(dataset[i:i+w, stat_to_plot])
-          if ((i > w/2) && (i<nrow(dataset)-(w/2))) dataset[i,"smooth"] <- mean(dataset[i-(w/2):i+(w/2), stat_to_plot])
-          if (i >= nrow(dataset)-(w/2)) dataset[i,"smooth"] <- mean(dataset[i-w:i, stat_to_plot])
+          if (i <= w) dataset[i,"smooth"] <- mean(dataset[0:i, stat_to_plot])
+          if (i > w) dataset[i,"smooth"] <- mean(dataset[(i-w):i, stat_to_plot])
+          #if (i >= nrow(dataset)-(w/2)) dataset[i,"smooth"] <- mean(dataset[i-w:i, stat_to_plot])
         }
       }
 
@@ -510,14 +511,15 @@ server <- function(input, output) {
     
     if (colname_suffix == "GrowthRate"){
       dataset$smooth <- dataset[, stat_to_plot]
-      dataset[(is.na(dataset[,"smooth"])) |(is.infinite(dataset[,"smooth"])), "smooth"] <- 0
+      dataset[(is.nan(dataset[, stat_to_plot]))|(is.infinite(dataset[, stat_to_plot])), stat_to_plot] <- 0
+      dataset[(is.nan(dataset[,"smooth"])) | (is.na(dataset[,"smooth"])) |(is.infinite(dataset[,"smooth"])), "smooth"] <- 0
       
-      w <- 2*input$smooth_growth_rate_italy
-      if (w >= 2){
-        for (i in seq(1:nrow(dataset))){
-          if (i <= w/2) dataset[i,"smooth"] <- mean(dataset[i:i+w, stat_to_plot])
-          if ((i > w/2) && (i<nrow(dataset)-(w/2))) dataset[i,"smooth"] <- mean(dataset[i-(w/2):i+(w/2), stat_to_plot])
-          if (i >= nrow(dataset)-(w/2)) dataset[i,"smooth"] <- mean(dataset[i-w:i, stat_to_plot])
+      w <- input$smooth_growth_rate_italy
+      if (w >= 1){
+        for (i in seq(0:nrow(dataset))){
+          if (i <= w) dataset[i,"smooth"] <- mean(dataset[0:i, stat_to_plot])
+          if (i > w) dataset[i,"smooth"] <- mean(dataset[(i-w):i, stat_to_plot])
+          #if (i >= nrow(dataset)-(w/2)) dataset[i,"smooth"] <- mean(dataset[i-w:i, stat_to_plot])
         }
       }
       
