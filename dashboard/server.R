@@ -9,367 +9,112 @@ library(scales)
 library(TSclust)
 library(changepoint)
 library(changepoint.np)
+library(waiter)
 
 source("functions.R")
+source("common.R")
 
-
-##Download Data##
-info_data <- readRDS(url(
-  "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/COVID19_Country_Info.Rdata?raw=true"))
-global_data <- readRDS(url(
-  "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/COVID19_Global_Italy_wGrowth.Rdata?raw=true"))
-
-stats <- c("ConfirmedGrowthRate", "DeathsGrowthRate", "RecoveredGrowthRate")
-time_series_by_stat <- lapply(stats, function(colname) setup_time_series(global_data, colname))
-names(time_series_by_stat) <- stats
-
-##Split between Italian and Global Data##
-is_regional_italy <- (global_data$Country.Region == "Italy") & (global_data$Province.State != "")
-italian_data <- global_data[is_regional_italy, ]
-global_data <- global_data[!is_regional_italy, ]
-
-global_data_by_action <- to_long_format_on_action(global_data, info_data)
-global_data_by_action <- global_data_by_action[is.finite(global_data_by_action$ConfirmedGrowthRate),]
-
-##Make lists for input panels##
-countries <- unique(global_data["Country.Region"])
-countries_with_regions <- unique(global_data[global_data$Province.State != "", "Country.Region"])
-statistics_italy <- names(global_data)[6:15]
-statistics_global <- names(global_data)[6:8]
-italian_regions <- unique(italian_data["Province.State"])
-
-european_countries <- c("Austria","Belgium","Bulgaria","Croatia","Cyprus","Czechia",
-                        "Denmark","Estonia","Finland","Germany","Greece",
-                        "Hungary","Ireland","Italy","Latvia","Lithuania","Luxembourg","Malta",
-                        "Netherlands","Poland","Portugal","Romania","Slovakia","Slovenia","Spain","Sweden")
-
-
-action_label_dict <- list("Date.Schools" = "Schools closure",
-                    "Date.Public Places" = "Public places shut down",
-                    "Date.Gatherings" = "Gatherings ban",
-                    "Date.Stay at Home" = "Stay at home",
-                    "Date.Non-essential" = "Non-essential activities ban")
-
-# Create the same dict mapping, but reversed (for creating radio buttons)
-action_label_dict_rev <- names(action_label_dict)
-names(action_label_dict_rev) <- unname(action_label_dict)
-
-
-stat_label_dict <- c("Confirmed cases" = "Confirmed",
-                    "Deaths" = "Deaths",
-                    "Recovered" = "Recovered")
-
-
-RAWDATA_BASED <- c("DTWARP", "FRECHET", "EUCL")
-AUTOCORRELATION_BASED <- c("ACF", "PACF")
-CORRELATION_BASED <- c("COR")
-PROXIMITYVALUE_BASED <- c("CORT")
-PERIODOGRAM_BASED <- c("PER", "INT.PER")
-SPECTRAL_BASED <- c("SPEC.LLR", "SPEC.GLK", "SPEC.ISD")
-MODEL_BASED <- c("AR.MAH", "AR.PIC", "AR.LPC.CEPS")
-COMPLEXITY_BASED <- c("PDC","CDM","CID", "NCD")
-SYMBOLIC_BASED <- c("MINDIST.SAX")
-PREDICTION_BASED <- c("PRED")
-WAVELET_BASED <- c("DWT")
-TS_CLUST_DISTANCES <- c(RAWDATA_BASED,
-                        AUTOCORRELATION_BASED,
-                        CORRELATION_BASED,
-                        PROXIMITYVALUE_BASED,
-                        PERIODOGRAM_BASED,
-                        SPECTRAL_BASED,
-                        MODEL_BASED,
-                        COMPLEXITY_BASED,
-                        SYMBOLIC_BASED,
-                        PREDICTION_BASED,
-                        WAVELET_BASED)
-
-# To use together with the function format, on dates
-date_format <- "%b %d"
-
-
-world_side_panel <- sidebarPanel(
-  selectInput(
-    inputId = "country",
-    label = "Choose a country:",
-    selected = countries[83,],
-    choices = countries
-  ),
-  
-  uiOutput("region_selector"),
-  
-  selectInput(
-    inputId = "world_stat",
-    label = "Choose a statistic:",
-    choices = stat_label_dict,
-    selected = stat_label_dict[1]
-  ),
-  
-  sliderInput(
-    "range",
-    label = "Days of interest (0 = last day):",
-    min = -60,
-    max = 0,
-    value = c(-30, 0)
-  ),
-  
-  checkboxInput("log_scale_world", "Use log scale for Y", FALSE),
-  
-  radioButtons("dates", "Show a special date:", unlist(action_label_dict_rev)),
-  
-  sliderInput(
-    "smooth_growth_rate_world",
-    label = "Degree of growth-rate smoothing:",
-    min = 0,
-    max = 10,
-    value = 0
-  ),
-  
-  sliderInput(
-    "linear_fitting_world",
-    label = "Number of last days fitted",
-    min = 5,
-    max = 10,
-    value = 5
-  ),
-
-  sliderInput(
-    "clusters",
-    label = "Clusters: (only for TS clustering)",
-    min = 2,
-    max = length(european_countries),
-    value = 2,
-    step = 1
-  ),
-  
-  selectInput(
-    inputId = "clustering_distance",
-    label = "Choose a clustering distance: (Only for TS clustering)",
-    choices = TS_CLUST_DISTANCES,
-    selected = TS_CLUST_DISTANCES[4]
-  )
-  
-)
-
-
-world_main_panel <- mainPanel(
-  tabsetPanel(
-    tabPanel("Time evolution",
-       column(
-         width = 12,
-		 uiOutput("help_text_panel1"),
-         box(
-           title = "Total cases",
-           width = NULL,
-           solidHeader = TRUE,
-           status = "primary",
-           plotOutput("cases_plot")
-         ),
-         box(
-           title = "Growth Rate",
-           width = NULL,
-           solidHeader = TRUE,
-           status = "primary",
-           plotOutput("growth_plot")
-         )
-       )
-    ),
-    
-    tabPanel("Distribution comparison",
-       column(
-         width = 12,
-		 uiOutput("help_text_panel2"),
-         box(
-           title = "Distribution of growth rate before and after action",
-           width = NULL,
-           solidHeader = TRUE,
-           status = "primary",
-           plotOutput("action_comp_plot")
-         )
-       )
-    ),
-    
-    tabPanel("Change point detection",
-       column(
-         width = 12,
-         uiOutput("help_text_panel3"),
-         box(
-           title = "Detection of change point",
-           width = NULL,
-           solidHeader = TRUE,
-           status = "primary",
-           plotOutput("change_point_plot")
-         ),
-         wellPanel(
-           helpText("We employ an algorithm (based on the R package changepoints) to detect a shift in the distribution of the data.
-                    The algorithm assumes a prior normal distribution of the data, and finds the optimal number of change points
-                    (in terms of mean and variance), based on a binary segmentation algorithm (Scott and Knott (1974)).")
-         )
-       )
-    ),
-    
-    tabPanel("Time series clustering",
-             column(
-               width = 12,
-               uiOutput("help_text_panel4"),
-               box(
-                 title = "Time series clustering",
-                 width = NULL,
-                 solidHeader = TRUE,
-                 status = "primary",
-                 plotOutput("ts_cluster_plot",width = "100%")
-               )
-             )
-    )
-  )
-)
-
-
-italy_side_panel <- sidebarPanel(
-  # This is a hidden field acting as a placeholder,
-  # allowing to treat the Italy tab the same way as
-  # the World tab
-  conditionalPanel("false",
-    textInput(
-      inputId = "italy_country",
-      label = "",
-      value = "Italy"
-    )
-  ),
-  selectInput(
-    inputId = "italy_region",
-    label = "Choose a region:",
-    selected = italian_regions[0],
-    choices = italian_regions
-  ),
-  
-  selectInput(
-    inputId = "italy_statistic",
-    label = "Choose a statistic:",
-    selected = statistics_italy[0],
-    choices = statistics_italy
-  ),
-  
-  sliderInput(
-    inputId = "italy_range",
-    label = "Days of interest (0 = last day):",
-    min = -60,
-    max = 0,
-    value = c(-30, 0)
-  ),
-  checkboxInput("log_scale_world_IT", "Use log scale for Y", FALSE),
-  
-  
-  uiOutput("italy_sliders")
-)
-
-
-italy_main_panel <- mainPanel(column(
-  width = 10,
-  box(
-    title = "Statistics",
-    width = NULL,
-    solidHeader = TRUE,
-    status = "primary",
-    plotOutput("chosen_stat_it_plot")
-  ),
-  uiOutput("italy_growth")
-))
-
-
-ranking_side_panel <- sidebarPanel(
-  radioButtons("ranking_date", "Confinement action used in ranking", unlist(action_label_dict_rev)),
-  helpText(
-    "In this section, a t-test is performed to assess the difference between the
-    distribution of the growth rate of confirmed cases, before and after
-    an action is taken. We report here the resulting statistic,
-    the one-sided p-value and the difference (delta) between the means.
-    The p-values are adjusted using Holm's method."
-  )
-)
-
-
-ranking_main_panel <- mainPanel(
-  box(
-    title = "Ranking",
-    width = NULL,
-    solidHeader = TRUE,
-    status = "primary",
-    plotOutput("ranking_plot")
-  )
-)
-
-
-ui <- dashboardPage(
-  dashboardHeader(title = "COVID-19 Impact of Policies", titleWidth = 350),
-    dashboardSidebar(width = 125, sidebarMenu(
-    menuItem("World", tabName = "world", icon = icon("bar-chart-o")),
-    menuItem("Italy", tabName = "italy", icon = icon("bar-chart-o")),
-    menuItem("Ranking", tabName = "ranking", icon = icon("bar-chart-o")),
-    menuItem("About", tabName = "about", icon = icon("question"))
-  )),
-  
-  ## Body content
-  dashboardBody(fluidPage(tabItems(
-    # First tab content
-    tabItem(tabName = "world",
-            world_side_panel,
-            world_main_panel),
-    tabItem(tabName = "italy",
-            italy_side_panel,
-            italy_main_panel),
-    tabItem(tabName = "ranking",
-            ranking_side_panel,
-            ranking_main_panel),
-    tabItem(tabName = "about",
-            fluidPage(
-                   tags$iframe(src = './about.html', 
-                               width = '100%', height = '800px',
-                               frameborder = 0, scrolling = 'auto'
-                   )
-              ))
-  )))
-)
 
 server <- function(input, output) {
+  # Download Data
+  info_data <- readRDS(url(
+    "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/COVID19_Country_Info.Rdata?raw=true"))
+  global_data <- readRDS(url(
+    "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/COVID19_Global_Italy_wGrowth.Rdata?raw=true"))
+  
+  waiter_update(html = tagList(
+      spin_wave(),
+      "Preprocessing data..."
+    ))
+  
+  time_series_colnames <- c("ConfirmedGrowthRate", "DeathsGrowthRate", "RecoveredGrowthRate")
+  time_series_by_stat <- setup_time_series(global_data, time_series_colnames)
+  names(time_series_by_stat) <- time_series_colnames
+  # Split between Italian and Global Data
+  is_regional_italy <- (global_data$Country.Region == "Italy") & (global_data$Province.State != "")
+  italian_data <- global_data[is_regional_italy, ]
+  global_data <- global_data[!is_regional_italy, ]
+  
+  global_data_by_action <- to_long_format_on_action(global_data, info_data)
+  global_data_by_action <- global_data_by_action[is.finite(global_data_by_action$ConfirmedGrowthRate),]
+  
+  # Make lists for input panels
+  countries <- unique(global_data["Country.Region"])
+  countries_with_regions <- unique(global_data[global_data$Province.State != "", "Country.Region"])
+  italian_regions <- unique(italian_data["Province.State"])
+  
+  # To use together with the function format, on dates
+  date_format <- "%b %d"
+  
+  # Hide the loading screen
+  waiter_hide()
+  
   ##############
   ##RENDERINGS##
   ##############
   
+  # Create the country selector for the World tab
+  # It is defined here because it depends on the dataset
+  output$country_selector <- renderUI({
+    selectInput(
+      inputId = "country",
+      label = "Choose a country:",
+      selected = countries[83,],
+      choices = countries
+    )
+  })
+  
   ## Render the region selector if a country with regions is chosen
   output$region_selector <- renderUI({
-    if (input$country %in% countries_with_regions) {
-      selectInput(
-        inputId = 'region',
-        label = 'Choose a region:',
-        choices = unique(global_data[global_data$Country.Region == input$country , "Province.State"])
-      )
-    } else {
+    # I can't get logical short circuit to work here
+    if (is.null(input$country))
       return(NULL)
-    }
+    else if (!input$country %in% countries_with_regions)
+      return(NULL)
+    else
+      return(
+      selectInput(
+          inputId = 'region',
+          label = 'Choose a region:',
+          choices = unique(global_data[global_data$Country.Region == input$country , "Province.State"])
+        )
+    )
+  })
+  
+  # Create the region selector for the Italy tab
+  # It is defined here because it depends on the dataset
+  output$italy_region_selection <- renderUI({
+    italian_regions <- unique(italian_data["Province.State"])
+    selectInput(
+      inputId = "italy_region",
+      label = "Choose a region:",
+      selected = italian_regions[1],
+      choices = italian_regions
+    )
     
   })
   
   output$italy_sliders <- renderUI({
-    if(input$italy_statistic %in% c("Confirmed","Deaths","Recovered")){
-    box(
-      width = 150,
-      sliderInput(
-        "smooth_growth_rate_italy",
-        label = "Degree of growth-rate smoothing:",
-        min = 0,
-        max = 10,
-        value = 0
-      ),
-      
-      sliderInput(
-        "linear_fitting_italy",
-        label = "Number of last days fitted",
-        min = 5,
-        max = 10,
-        value = 5
+    if (input$italy_statistic %in% c("Confirmed","Deaths","Recovered")) {
+      box(
+        width = 150,
+        sliderInput(
+          "smooth_growth_rate_italy",
+          label = "Degree of growth-rate smoothing:",
+          min = 0,
+          max = 10,
+          value = 0
+        ),
+        
+        sliderInput(
+          "linear_fitting_italy",
+          label = "Number of last days fitted",
+          min = 5,
+          max = 10,
+          value = 5
+        )
       )
-    )
-    }else {
+    } else {
       return(NULL)
     }
   })
@@ -508,7 +253,13 @@ server <- function(input, output) {
                                                 is_growth_rate = TRUE, is_italy_tab = TRUE)
   
   output$action_comp_plot <- renderPlot({
-    dataset <- dataset_by_action_input()
+    min_date = Sys.Date() + input$range[1]
+    max_date = Sys.Date() + input$range[2]
+    
+    dataset <- global_data_by_action[(global_data_by_action$Country.Region == input$country) &
+                           (global_data_by_action$Province.State == ifelse(input$country %in% countries_with_regions, input$region, "")) &
+                           (global_data_by_action$Date >= min_date) &
+                           (global_data_by_action$Date <= max_date),]
     dataset <- dataset[dataset$Action == as.character(input$dates),]
     stat_to_plot <- paste0(input$world_stat, "GrowthRate")
     ggplot(dataset, aes_string(x = "BeforeAction", color="BeforeAction", y = stat_to_plot)) + 
@@ -537,7 +288,8 @@ server <- function(input, output) {
     to_plot.df <- data.frame(Date = index(to_plot.ts), Value = coredata(to_plot.ts))
     
     # Show lines with important dates
-    country_info <- get_country_info()
+    country_info <- info_data[(info_data$Country.Region == input$country) &
+                              (info_data$Province.State == ifelse(input$country %in% countries_with_regions, input$region, "")),]
     texts_to_show <- as.character(input$dates)
     dates_to_show <- do.call("c", lapply(texts_to_show, function(col) country_info[, col]))
     # Remove NAs to avoid a warning
@@ -635,6 +387,3 @@ server <- function(input, output) {
       theme_bw()
   })
 }
-
-
-shinyApp(ui, server)
