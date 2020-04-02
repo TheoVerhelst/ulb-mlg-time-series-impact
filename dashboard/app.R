@@ -120,7 +120,7 @@ world_side_panel <- sidebarPanel(
     "smooth_growth_rate_world",
     label = "Degree of growth-rate smoothing:",
     min = 0,
-    max = 5,
+    max = 10,
     value = 0
   ),
   
@@ -357,7 +357,7 @@ server <- function(input, output) {
         "smooth_growth_rate_italy",
         label = "Degree of growth-rate smoothing:",
         min = 0,
-        max = 0,
+        max = 10,
         value = 0
       ),
       
@@ -427,7 +427,7 @@ server <- function(input, output) {
     events <- unlist(action_label_dict[texts_to_show])
     days <- unlist(dates_to_show_lab)
     
-    p <- ggplot(as.data.frame(data), aes_string(x = "Date", y = stat_to_plot)) +
+    p <- ggplot(data, aes_string(x = "Date", y = stat_to_plot)) +
       geom_line() +
       geom_vline(xintercept = dates_to_show) +
       xlab("Date") +
@@ -438,54 +438,54 @@ server <- function(input, output) {
     
     
     if (is_growth_rate) {
-        data$smooth <- data[, stat_to_plot]
-        data[(is.na(data[,"smooth"])) | (is.infinite(data[,"smooth"])), "smooth"] <- 0
-  
-        w <- 2 * input$smooth_growth_rate_world
-        if (w >= 2){
-          for (i in seq(1:nrow(data))){
-            if (i <= w/2)
-              data[i, "smooth"] <- mean(data[i:(i+w), stat_to_plot])
-            if ((i > w/2) && (i<nrow(data)-(w/2)))
-              data[i, "smooth"] <- mean(data[(i-(w/2)):(i+(w/2)), stat_to_plot])
-            if (i >= nrow(data)-(w/2))
-              data[i, "smooth"] <- mean(data[(i-w):i, stat_to_plot])
-          }
+      # Perform smoothing
+      data_smooth <- data[, c("Date", stat_to_plot)]
+      data_smooth$smooth <- data_smooth[, stat_to_plot]
+      data_smooth[(is.nan(data_smooth[, stat_to_plot]))|(is.infinite(data_smooth[, stat_to_plot])), stat_to_plot] <- 0
+      data_smooth[(is.na(data_smooth[,"smooth"])) | (is.infinite(data_smooth[,"smooth"])), "smooth"] <- 0
+
+      w <- input$smooth_growth_rate_world
+      if (w >= 1){
+        for (i in seq(1:nrow(data_smooth))){
+          if (i <= w) data_smooth[i,"smooth"] <- mean(data_smooth[0:i, stat_to_plot])
+          if (i > w) data_smooth[i,"smooth"] <- mean(data_smooth[(i-w):i, stat_to_plot])
+          #if (i >= nrow(dataset)-(w/2)) dataset[i,"smooth"] <- mean(dataset[i-w:i, stat_to_plot])
         }
-        
-        p <- p + geom_line(as.data.frame(data), mapping = aes_string(x = "Date", y = "smooth"), color = "blue")
-        
-        min_fit_date = max_date - input[[linear_fitting_name]] - 2
-        max_fit_date = max_date
-        data_to_fit <- data[(data$Date >= min_fit_date) & (data$Date <= max_fit_date),]
-        data_to_fit <- data_to_fit[!is.na(data_to_fit[,stat_to_plot]),]
-        
-        if (nrow(data_to_fit) > 3) {
-          fitted <- lm(formula = paste(stat_to_plot, "~ Date"), data = data_to_fit)
-          date_p_val <- summary(fitted)$coefficients["Date", 4]
+      }
+      p <- p + geom_line(data_smooth, mapping = aes_string(x = "Date", y = "smooth"), color = "blue")
       
-          predicted <- data.frame(predicted = predict(fitted, newdata = data_to_fit["Date"]), Date = data_to_fit["Date"])
-          
-          date_coef <- summary(fitted)$coefficients["Date", 1]
-          intercept <- summary(fitted)$coefficients["(Intercept)", 1]
-          root <- as.Date(-intercept / date_coef)
-          
-          if (is.finite(root) & date_coef < 0) {
-            root_text <- paste("growth rate null on", format(root, date_format))
-          } else {
-            root_text <- "growth rate increases"
-          }
-          
-          p <- p +
-            geom_line(data = predicted, aes(x = Date, y = predicted), color = "red", size = 1.5) +
-            annotate("text",
-                     x = predicted[1, "Date"], y = predicted[1, "predicted"], vjust = -1.5, hjust = 0,
-                     label =  paste("p =", format(date_p_val, digits = 2), "\n", root_text))
+      # Perform linear fitting on the last days
+      min_fit_date = max_date - input[[linear_fitting_name]] - 2
+      max_fit_date = max_date
+      data_to_fit <- data[(data$Date >= min_fit_date) & (data$Date <= max_fit_date),]
+      data_to_fit <- data_to_fit[!is.na(data_to_fit[,stat_to_plot]),]
+      
+      if (nrow(data_to_fit) > 3) {
+        fitted <- lm(formula = paste(stat_to_plot, "~ Date"), data = data_to_fit)
+        date_p_val <- summary(fitted)$coefficients["Date", 4]
+    
+        predicted <- data.frame(predicted = predict(fitted, newdata = data_to_fit["Date"]), Date = data_to_fit["Date"])
+        
+        date_coef <- summary(fitted)$coefficients["Date", 1]
+        intercept <- summary(fitted)$coefficients["(Intercept)", 1]
+        root <- as.Date(-intercept / date_coef)
+        
+        if (is.finite(root) & date_coef < 0) {
+          root_text <- paste("growth rate null on", format(root, date_format))
+        } else {
+          root_text <- "growth rate increases"
         }
+        
+        p <- p +
+          geom_line(data = predicted, aes(x = Date, y = predicted), color = "red", size = 1.5) +
+          annotate("text",
+                   x = predicted[1, "Date"], y = predicted[1, "predicted"], vjust = -1.5, hjust = 0,
+                   label =  paste("p =", format(date_p_val, digits = 2), "\n", root_text))
+      }
     }
     p
   })
-     
+
   ########
   ##PLOTS#
   ########
