@@ -107,7 +107,7 @@ world_side_panel <- sidebarPanel(
   sliderInput(
     "range",
     label = "Days of interest (0 = last day):",
-    min = -90,
+    min = -60,
     max = 0,
     value = c(-30, 0)
   ),
@@ -225,6 +225,16 @@ world_main_panel <- mainPanel(
 
 
 italy_side_panel <- sidebarPanel(
+  # This is a hidden field acting as a placeholder,
+  # allowing to treat the Italy tab the same way as
+  # the World tab
+  conditionalPanel("false",
+    textInput(
+      inputId = "italy_country",
+      label = "",
+      value = "Italy"
+    )
+  ),
   selectInput(
     inputId = "italy_region",
     label = "Choose a region:",
@@ -244,7 +254,7 @@ italy_side_panel <- sidebarPanel(
     label = "Days of interest (0 = last day):",
     min = -60,
     max = 0,
-    value = c(-7, 0)
+    value = c(-30, 0)
   ),
   checkboxInput("log_scale_world_IT", "Use log scale for Y", FALSE),
   
@@ -321,38 +331,6 @@ ui <- dashboardPage(
 )
 
 server <- function(input, output) {
-  # slice exact part of dataset
-  datasetInput <- reactive({
-    min_date = Sys.Date() + input$range[1]
-    max_date = Sys.Date() + input$range[2]
-    return(global_data[(global_data$Country.Region == input$country) &
-                         (global_data$Province.State == ifelse(input$country %in% countries_with_regions, input$region, "")) &
-                         (global_data$Date >= min_date) &
-                         (global_data$Date <= max_date),])
-  })
-  
-    dataset_italy_Input <- reactive({
-    min_date = Sys.Date() + input$italy_range[1]
-    max_date = Sys.Date() + input$italy_range[2]
-    return(italian_data[ (italian_data$Province.State == input$italy_region) &
-                         (italian_data$Date >= min_date) &
-                         (italian_data$Date <= max_date),])
-  })
-  
-  # slice exact part of dataset
-  dataset_by_action_input <- reactive({
-    min_date = Sys.Date() + input$range[1]
-    max_date = Sys.Date() + input$range[2]
-    return(global_data_by_action[(global_data_by_action$Country.Region == input$country) &
-                         (global_data_by_action$Province.State == ifelse(input$country %in% countries_with_regions, input$region, "")) &
-                         (global_data_by_action$Date >= min_date) &
-                         (global_data_by_action$Date <= max_date),])
-  })
-  
-  get_country_info <- function() {
-    return(info_data[(info_data$Country.Region == input$country) &
-                         (info_data$Province.State == ifelse(input$country %in% countries_with_regions, input$region, "")),])
-  }
   ##############
   ##RENDERINGS##
   ##############
@@ -427,11 +405,17 @@ server <- function(input, output) {
   output$help_text_panel2  <- make_help()
   output$help_text_panel3  <- make_help()
   
-  make_plot <- function(colname_suffix, allow_log) renderPlot({
-    stat_to_plot <- paste0(input$world_stat, colname_suffix)
-    dataset <- datasetInput()
-    country_info <- get_country_info()
+  make_generic_plot <- function(data, country_name, region_name, date_range_name, stat_to_plot_name, log_scale_name, linear_fitting_name, is_growth_rate, is_italy_tab)  renderPlot({
+    country <- input[[country_name]]
+    region <- ifelse((country %in% countries_with_regions) | is_italy_tab, input[[region_name]], "")
+    min_date <- Sys.Date() + input[[date_range_name]][1]
+    max_date <- Sys.Date() + input[[date_range_name]][2]
+    stat_to_plot <- paste0(input[[stat_to_plot_name]], ifelse(is_growth_rate, "GrowthRate", ""))
     
+    data <- data[(data$Country.Region == country) & (data$Province.State == region) &
+                 (data$Date >= min_date) & (data$Date <= max_date),]
+    
+    country_info <- info_data[(info_data$Country.Region == country) & (info_data$Province.State == region),]
     texts_to_show <- as.character(input$dates)
     dates_to_show <- do.call("c", lapply(texts_to_show, function(col) country_info[, col]))
     
@@ -442,41 +426,40 @@ server <- function(input, output) {
     dates_to_show_lab <- format(dates_to_show, date_format)
     events <- unlist(action_label_dict[texts_to_show])
     days <- unlist(dates_to_show_lab)
- 
-    if (colname_suffix == "GrowthRate"){
-      dataset$smooth <- dataset[, stat_to_plot]
-      dataset[(is.na(dataset[,"smooth"])) |(is.infinite(dataset[,"smooth"])), "smooth"] <- 0
-
-      w <- 2*input$smooth_growth_rate_world
-      if (w >= 2){
-        for (i in seq(1:nrow(dataset))){
-          if (i <= w/2) dataset[i,"smooth"] <- mean(dataset[i:i+w, stat_to_plot])
-          if ((i > w/2) && (i<nrow(dataset)-(w/2))) dataset[i,"smooth"] <- mean(dataset[i-(w/2):i+(w/2), stat_to_plot])
-          if (i >= nrow(dataset)-(w/2)) dataset[i,"smooth"] <- mean(dataset[i-w:i, stat_to_plot])
-        }
-      }
-
-    }
     
-    p <- ggplot(as.data.frame(dataset), aes_string(x = "Date", y = stat_to_plot)) +
+    p <- ggplot(as.data.frame(data), aes_string(x = "Date", y = stat_to_plot)) +
       geom_line() +
       geom_vline(xintercept = dates_to_show) +
       xlab("Date") +
       ylab(stat_to_plot) +
       annotate("text", x = dates_to_show, y = 0, angle = 90, vjust = 1.5, hjust=-0.5, label =  paste(events, days, sep = ": ")) + 
-      scale_y_continuous(trans=ifelse(input$log_scale_world & allow_log, "log10", "identity")) +
+      scale_y_continuous(trans=ifelse(input[[log_scale_name]] && !is_growth_rate, "log10", "identity")) +
       theme_bw()
     
     
-    if (colname_suffix == "GrowthRate") {
-        p <- p + geom_line(as.data.frame(dataset), mapping = aes_string(x = "Date", y = "smooth"), color = "blue")
-        min_date = Sys.Date() + input$range[2] - input$linear_fitting_world - 2
-        max_date = Sys.Date() + input$range[2]
-        data_to_fit <- global_data[(global_data$Country.Region == input$country) &
-                               (global_data$Province.State == ifelse(input$country %in% countries_with_regions, input$region, "")) &
-                               (global_data$Date >= min_date) &
-                               (global_data$Date <= max_date),]
+    if (is_growth_rate) {
+        data$smooth <- data[, stat_to_plot]
+        data[(is.na(data[,"smooth"])) | (is.infinite(data[,"smooth"])), "smooth"] <- 0
+  
+        w <- 2 * input$smooth_growth_rate_world
+        if (w >= 2){
+          for (i in seq(1:nrow(data))){
+            if (i <= w/2)
+              data[i, "smooth"] <- mean(data[i:(i+w), stat_to_plot])
+            if ((i > w/2) && (i<nrow(data)-(w/2)))
+              data[i, "smooth"] <- mean(data[(i-(w/2)):(i+(w/2)), stat_to_plot])
+            if (i >= nrow(data)-(w/2))
+              data[i, "smooth"] <- mean(data[(i-w):i, stat_to_plot])
+          }
+        }
+        
+        p <- p + geom_line(as.data.frame(data), mapping = aes_string(x = "Date", y = "smooth"), color = "blue")
+        
+        min_fit_date = max_date - input[[linear_fitting_name]] - 2
+        max_fit_date = max_date
+        data_to_fit <- data[(data$Date >= min_fit_date) & (data$Date <= max_fit_date),]
         data_to_fit <- data_to_fit[!is.na(data_to_fit[,stat_to_plot]),]
+        
         if (nrow(data_to_fit) > 3) {
           fitted <- lm(formula = paste(stat_to_plot, "~ Date"), data = data_to_fit)
           date_p_val <- summary(fitted)$coefficients["Date", 4]
@@ -486,6 +469,7 @@ server <- function(input, output) {
           date_coef <- summary(fitted)$coefficients["Date", 1]
           intercept <- summary(fitted)$coefficients["(Intercept)", 1]
           root <- as.Date(-intercept / date_coef)
+          
           if (is.finite(root) & date_coef < 0) {
             root_text <- paste("growth rate null on", format(root, date_format))
           } else {
@@ -501,78 +485,27 @@ server <- function(input, output) {
     }
     p
   })
-  
-  make_plot_italy_growth <- function(colname_suffix, allow_log) renderPlot({
-    stat_to_plot <- paste0(input$italy_statistic, colname_suffix)
-    dataset <- dataset_italy_Input()
-  
- 
-    
-    if (colname_suffix == "GrowthRate"){
-      dataset$smooth <- dataset[, stat_to_plot]
-      dataset[(is.na(dataset[,"smooth"])) |(is.infinite(dataset[,"smooth"])), "smooth"] <- 0
-      
-      w <- 2*input$smooth_growth_rate_italy
-      if (w >= 2){
-        for (i in seq(1:nrow(dataset))){
-          if (i <= w/2) dataset[i,"smooth"] <- mean(dataset[i:i+w, stat_to_plot])
-          if ((i > w/2) && (i<nrow(dataset)-(w/2))) dataset[i,"smooth"] <- mean(dataset[i-(w/2):i+(w/2), stat_to_plot])
-          if (i >= nrow(dataset)-(w/2)) dataset[i,"smooth"] <- mean(dataset[i-w:i, stat_to_plot])
-        }
-      }
-      
-    }
-    
-    p <- ggplot(as.data.frame(dataset), aes_string(x = "Date", y = stat_to_plot)) +
-      geom_line() +
-      xlab("Date") +
-      ylab(stat_to_plot)+ 
-      theme_bw()
-    
-    
-    if (colname_suffix == "GrowthRate") {
-      p <- p + geom_line(as.data.frame(dataset), mapping = aes_string(x = "Date", y = "smooth"), color = "blue")
-      min_date = Sys.Date() + input$italy_range[2] - input$linear_fitting_italy - 2
-      max_date = Sys.Date() + input$italy_range[2]
-      data_to_fit <- italian_data[
-        (italian_data$Province.State == input$italy_region) &
-          (italian_data$Date >= min_date) &
-          (italian_data$Date <= max_date),]
-      data_to_fit <- data_to_fit[!is.na(data_to_fit[,stat_to_plot]),]
-      if (nrow(data_to_fit) > 3) {
-        fitted <- lm(formula = paste(stat_to_plot, "~ Date"), data = data_to_fit)
-        date_p_val <- summary(fitted)$coefficients["Date", 4]
-        
-        predicted <- data.frame(predicted = predict(fitted, newdata = data_to_fit["Date"]), Date = data_to_fit["Date"])
-        
-        date_coef <- summary(fitted)$coefficients["Date", 1]
-        intercept <- summary(fitted)$coefficients["(Intercept)", 1]
-        root <- as.Date(-intercept / date_coef)
-        if (is.finite(root) & date_coef < 0) {
-          root_text <- paste("growth rate null on", format(root, date_format))
-        } else {
-          root_text <- "growth rate increases"
-        }
-        
-        
-        p <- p +
-          geom_line(data = predicted, aes(x = Date, y = predicted), color = "red", size = 1.5) +
-          annotate("text",
-                   x = predicted[1, "Date"], y = predicted[1, "predicted"], vjust = -1.5, hjust = 0,
-                   label =  paste("p =", format(date_p_val, digits = 2), "\n", root_text))
-      }
-    }
-    p
-  })
-  
-  
+     
   ########
   ##PLOTS#
   ########
   
-  output$cases_plot <- make_plot("", allow_log = TRUE)
-  output$growth_plot <- make_plot("GrowthRate", allow_log = FALSE)
-  output$italy_growth_plot <- make_plot_italy_growth("GrowthRate", allow_log = FALSE)
+  output$cases_plot <- make_generic_plot(global_data, "country", "region", "range",
+                                         "world_stat", "log_scale_world",
+                                         "linear_fitting_world",
+                                         is_growth_rate = FALSE, is_italy_tab = FALSE)
+  output$growth_plot <- make_generic_plot(global_data, "country", "region", "range",
+                                          "world_stat", "log_scale_world",
+                                          "linear_fitting_world",
+                                          is_growth_rate = TRUE, is_italy_tab = FALSE)
+  output$chosen_stat_it_plot <- make_generic_plot(italian_data, "italy_country", "italy_region", "italy_range",
+                                                "italy_statistic", "log_scale_world_IT",
+                                                "linear_fitting_italy",
+                                                is_growth_rate = FALSE, is_italy_tab = TRUE)
+  output$italy_growth_plot <- make_generic_plot(italian_data, "italy_country", "italy_region", "italy_range",
+                                                "italy_statistic", "log_scale_world_IT",
+                                                "linear_fitting_italy",
+                                                is_growth_rate = TRUE, is_italy_tab = TRUE)
   
   output$action_comp_plot <- renderPlot({
     dataset <- dataset_by_action_input()
@@ -685,28 +618,6 @@ server <- function(input, output) {
             axis.text.x = element_text(angle=45))
     
     p
-    
-  })
-  
-  #########
-  ##ITALY##
-  #########
-  
-  output$chosen_stat_it_plot <- renderPlot({
-    min_it <- Sys.Date() + input$italy_range[1]
-    max_it <- Sys.Date() + input$italy_range[2]
-    
-    dataset <-
-      italian_data[(italian_data$Province.State == input$italy_region) &
-                     (italian_data$Date >= min_it) &
-                     (italian_data$Date <= max_it), ]
-    
-    ggplot(dataset, aes_string(x = "Date", y = input$italy_statistic)) +
-      geom_line() +
-      xlab("Date") +
-      ylab(input$italy_statistic) +
-      scale_y_continuous(trans=ifelse(input$log_scale_world_IT, "log10", "identity")) +
-      theme_bw()
   })
   
   output$ranking_plot <- renderPlot({
