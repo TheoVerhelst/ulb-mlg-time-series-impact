@@ -405,7 +405,7 @@ server <- function(input, output) {
   output$help_text_panel2  <- make_help()
   output$help_text_panel3  <- make_help()
   
-  make_generic_plot <- function(data, country_name, region_name, date_range_name, stat_to_plot_name, log_scale_name, linear_fitting_name, is_growth_rate, is_italy_tab)  renderPlot({
+  make_generic_plot <- function(data, country_name, region_name, date_range_name, stat_to_plot_name, log_scale_name, linear_fitting_name, smooth_growth_rate_name, is_growth_rate, is_italy_tab)  renderPlot({
     country <- input[[country_name]]
     region <- ifelse((country %in% countries_with_regions) | is_italy_tab, input[[region_name]], "")
     min_date <- Sys.Date() + input[[date_range_name]][1]
@@ -444,7 +444,7 @@ server <- function(input, output) {
       data_smooth[(is.nan(data_smooth[, stat_to_plot]))|(is.infinite(data_smooth[, stat_to_plot])), stat_to_plot] <- 0
       data_smooth[(is.na(data_smooth[,"smooth"])) | (is.infinite(data_smooth[,"smooth"])), "smooth"] <- 0
 
-      w <- input$smooth_growth_rate_world
+      w <- input[[smooth_growth_rate_name]]
       if (w >= 1){
         for (i in seq(1:nrow(data_smooth))){
           if (i <= w) data_smooth[i,"smooth"] <- mean(data_smooth[0:i, stat_to_plot])
@@ -492,19 +492,19 @@ server <- function(input, output) {
   
   output$cases_plot <- make_generic_plot(global_data, "country", "region", "range",
                                          "world_stat", "log_scale_world",
-                                         "linear_fitting_world",
+                                         "linear_fitting_world", "smooth_growth_rate_world",
                                          is_growth_rate = FALSE, is_italy_tab = FALSE)
   output$growth_plot <- make_generic_plot(global_data, "country", "region", "range",
                                           "world_stat", "log_scale_world",
-                                          "linear_fitting_world",
+                                          "linear_fitting_world", "smooth_growth_rate_world",
                                           is_growth_rate = TRUE, is_italy_tab = FALSE)
   output$chosen_stat_it_plot <- make_generic_plot(italian_data, "italy_country", "italy_region", "italy_range",
                                                 "italy_statistic", "log_scale_world_IT",
-                                                "linear_fitting_italy",
+                                                "linear_fitting_italy", "smooth_growth_rate_italy",
                                                 is_growth_rate = FALSE, is_italy_tab = TRUE)
   output$italy_growth_plot <- make_generic_plot(italian_data, "italy_country", "italy_region", "italy_range",
                                                 "italy_statistic", "log_scale_world_IT",
-                                                "linear_fitting_italy",
+                                                "linear_fitting_italy", "smooth_growth_rate_italy",
                                                 is_growth_rate = TRUE, is_italy_tab = TRUE)
   
   output$action_comp_plot <- renderPlot({
