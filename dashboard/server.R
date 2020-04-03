@@ -172,7 +172,7 @@ server <- function(input, output) {
     dates_to_show <- dates_to_show[!is.na(dates_to_show)]
     
     dates_to_show_lab <- format(dates_to_show, date_format)
-    events <- unlist(action_label_dict[texts_to_show])
+    events <- unlist(policy_label_dict[texts_to_show])
     days <- unlist(dates_to_show_lab)
     
     p <- ggplot(data, aes_string(x = "Date", y = stat_to_plot)) +
@@ -319,7 +319,7 @@ server <- function(input, output) {
       geom_vline(xintercept = dates_to_show) +
       xlab("Date") +
       ylab(paste(input$world_stat, "growth rate")) +
-      annotate("text", x = dates_to_show, y = 0, angle = 90, vjust = 1.5, hjust=-1.5, label = unlist(action_label_dict[texts_to_show])) +
+      annotate("text", x = dates_to_show, y = 0, angle = 90, vjust = 1.5, hjust=-1.5, label = unlist(policy_label_dict[texts_to_show])) +
       theme_bw()
     
     # Compute change point detection

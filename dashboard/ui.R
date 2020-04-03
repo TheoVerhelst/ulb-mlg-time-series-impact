@@ -11,8 +11,8 @@ world_side_panel <- sidebarPanel(
   selectInput(
     inputId = "world_stat",
     label = "Choose a statistic:",
-    choices = stat_global_label_dict,
-    selected = stat_global_label_dict[1]
+    choices = world_stat_label_dict,
+    selected = world_stat_label_dict[1]
   ),
   
   sliderInput(
@@ -25,7 +25,7 @@ world_side_panel <- sidebarPanel(
   
   checkboxInput("world_log_scale", "Use log scale for Y", FALSE),
   
-  radioButtons("world_policies", "Show a policy:", unlist(action_label_dict_rev)),
+  radioButtons("world_policies", "Show a policy:", unlist(policy_label_dict_rev)),
   
   sliderInput(
     "world_smooth_growth_rate",
@@ -151,8 +151,8 @@ italy_side_panel <- sidebarPanel(
   selectInput(
     inputId = "italy_stat",
     label = "Choose a statistic:",
-    choices = stat_italy_label_dict,
-    selected = stat_italy_label_dict[0]
+    choices = italy_stat_label_dict,
+    selected = italy_stat_label_dict[0]
   ),
   
   sliderInput(
@@ -183,7 +183,7 @@ italy_main_panel <- mainPanel(column(
 
 
 ranking_side_panel <- sidebarPanel(
-  radioButtons("ranking_policy", "Confinement policy used in ranking", unlist(action_label_dict_rev)),
+  radioButtons("ranking_policy", "Confinement policy used in ranking", unlist(policy_label_dict_rev)),
   helpText(
     "In this section, a t-test is performed to assess the difference between the
     distribution of the growth rate of confirmed cases, before and after

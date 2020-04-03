@@ -1,4 +1,5 @@
 library(shiny)
+library(waiter)
 
 european_countries <- c("Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czechia",
                         "Denmark", "Estonia", "Finland", "Germany", "Greece",
@@ -6,22 +7,22 @@ european_countries <- c("Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "
                         "Netherlands", "Poland", "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden")
 
 
-action_label_dict <- c("Date.Schools" = "Schools closure",
+policy_label_dict <- c("Date.Schools" = "Schools closure",
                        "Date.Public Places" = "Public places shut down",
                        "Date.Gatherings" = "Gatherings ban",
                        "Date.Stay at Home" = "Stay at home",
                        "Date.Non-essential" = "Non-essential activities ban")
 
 # Create the same dict mapping, but reversed (for creating radio buttons)
-action_label_dict_rev <- names(action_label_dict)
-names(action_label_dict_rev) <- unname(action_label_dict)
+policy_label_dict_rev <- names(policy_label_dict)
+names(policy_label_dict_rev) <- unname(policy_label_dict)
 
 
-stat_global_label_dict <- c("Confirmed cases" = "Confirmed",
+world_stat_label_dict <- c("Confirmed cases" = "Confirmed",
                             "Deaths" = "Deaths",
                             "Recovered" = "Recovered")
 
-stat_italy_label_dict <- c("Confirmed cases" = "Confirmed",
+italy_stat_label_dict <- c("Confirmed cases" = "Confirmed",
                            "Recovered cases" = "Recovered",
                            "Deaths" = "Deaths",
                            "Hospitalized with symptoms" = "HospitalizedWSymptoms",
