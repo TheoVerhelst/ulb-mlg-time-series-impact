@@ -20,7 +20,7 @@ world_side_panel <- sidebarPanel(
     label = "Days of interest (0 = last day):",
     min = -60,
     max = 0,
-    value = c(-30, 0)
+    value = c(-40, 0)
   ),
   
   checkboxInput("log_scale_world", "Use log scale for Y", FALSE),
@@ -160,7 +160,7 @@ italy_side_panel <- sidebarPanel(
     label = "Days of interest (0 = last day):",
     min = -60,
     max = 0,
-    value = c(-30, 0)
+    value = c(-40, 0)
   ),
   checkboxInput("log_scale_world_IT", "Use log scale for Y", FALSE),
   
@@ -238,9 +238,6 @@ dashboardPage(
       )
     ),
     # Show the loading screen at launch, it has to be the last UI element 
-    waiter_show_on_load(html = tagList(
-      spin_wave(),
-      "Downloading data..."
-    ))
+    waiter_show_on_load(color = "#ffffff", html = loading_screen("Downloading data..."))
   ))
 )

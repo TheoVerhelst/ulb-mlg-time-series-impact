@@ -22,10 +22,7 @@ server <- function(input, output) {
   global_data <- readRDS(url(
     "https://github.com/TheoVerhelst/ulb-mlg-time-series-impact/blob/master/data/COVID19_Global_Italy_wGrowth.Rdata?raw=true"))
   
-  waiter_update(html = tagList(
-      spin_wave(),
-      "Preprocessing data..."
-    ))
+  waiter_update(html = loading_screen("Preprocessing data..."))
   
   time_series_colnames <- c("ConfirmedGrowthRate", "DeathsGrowthRate", "RecoveredGrowthRate")
   time_series_by_stat <- setup_time_series(global_data, time_series_colnames)
@@ -52,6 +49,15 @@ server <- function(input, output) {
   ##############
   ##RENDERINGS##
   ##############
+  
+  get_region <- reactive({
+    if (is.null(input$country))
+      return("")
+    else if (input$country %in% countries_with_regions)
+      return(input$region)
+    else
+      return("")
+  })
   
   # Create the country selector for the World tab
   # It is defined here because it depends on the dataset
@@ -135,7 +141,7 @@ server <- function(input, output) {
   
   make_help <- function() renderUI({
     relevant_row <- (info_data$Country.Region == input$country) &
-           (info_data$Province.State == ifelse(input$country %in% countries_with_regions, input$region, ""))
+           (info_data$Province.State == get_region())
     if(sum(relevant_row) == 0) {
       HTML("<strong style='color:red'>Selected Date is not available for the specified country</strong>")
     } else if (is.na(info_data[relevant_row, input$dates])) {
@@ -151,8 +157,11 @@ server <- function(input, output) {
   output$help_text_panel3  <- make_help()
   
   make_generic_plot <- function(data, country_name, region_name, date_range_name, stat_to_plot_name, log_scale_name, linear_fitting_name, smooth_growth_rate_name, is_growth_rate, is_italy_tab)  renderPlot({
-    country <- input[[country_name]]
-    region <- ifelse((country %in% countries_with_regions) | is_italy_tab, input[[region_name]], "")
+    # the req function stops the rendering if the corresponding inputs are not yet available
+    # this avoids an error early in the loading of the page, when the UI is loaded after
+    # this portion of code.
+    country <- req(input[[country_name]])
+    region <- ifelse(is_italy_tab, req(input[[region_name]]), get_region())
     min_date <- Sys.Date() + input[[date_range_name]][1]
     max_date <- Sys.Date() + input[[date_range_name]][2]
     stat_to_plot <- paste0(input[[stat_to_plot_name]], ifelse(is_growth_rate, "GrowthRate", ""))
@@ -233,7 +242,7 @@ server <- function(input, output) {
 
   ########
   ##PLOTS#
-  ########
+  ########  
   
   output$cases_plot <- make_generic_plot(global_data, "country", "region", "range",
                                          "world_stat", "log_scale_world",
@@ -257,7 +266,7 @@ server <- function(input, output) {
     max_date = Sys.Date() + input$range[2]
     
     dataset <- global_data_by_action[(global_data_by_action$Country.Region == input$country) &
-                           (global_data_by_action$Province.State == ifelse(input$country %in% countries_with_regions, input$region, "")) &
+                           (global_data_by_action$Province.State == get_region()) &
                            (global_data_by_action$Date >= min_date) &
                            (global_data_by_action$Date <= max_date),]
     dataset <- dataset[dataset$Action == as.character(input$dates),]
@@ -277,7 +286,7 @@ server <- function(input, output) {
     # Select the right statistic
     to_plot.ts <- time_series_by_stat[paste0(input$world_stat, "GrowthRate")][[1]]
     # Select the right country
-    country_pair <- paste0(input$country, "_", ifelse(input$country %in% countries_with_regions, input$region, ""))
+    country_pair <- paste0(input$country, "_", get_region())
     to_plot.ts <- to_plot.ts[,country_pair]
     # Select the right date range
     min_date = Sys.Date() + input$range[1]
@@ -289,7 +298,7 @@ server <- function(input, output) {
     
     # Show lines with important dates
     country_info <- info_data[(info_data$Country.Region == input$country) &
-                              (info_data$Province.State == ifelse(input$country %in% countries_with_regions, input$region, "")),]
+                              (info_data$Province.State == get_region()),]
     texts_to_show <- as.character(input$dates)
     dates_to_show <- do.call("c", lapply(texts_to_show, function(col) country_info[, col]))
     # Remove NAs to avoid a warning

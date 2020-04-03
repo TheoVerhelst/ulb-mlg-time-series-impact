@@ -1,3 +1,5 @@
+library(shiny)
+
 european_countries <- c("Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czechia",
                         "Denmark", "Estonia", "Finland", "Germany", "Greece",
                         "Hungary", "Ireland", "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta",
@@ -52,3 +54,10 @@ TS_CLUST_DISTANCES <- c(RAWDATA_BASED,
                         SYMBOLIC_BASED,
                         PREDICTION_BASED,
                         WAVELET_BASED)
+
+loading_screen <- function(text) {
+  tagList(
+      spin_loaders(id = 24, color = "grey"),
+      h4(text, style = "color:gray;")
+    )
+}
