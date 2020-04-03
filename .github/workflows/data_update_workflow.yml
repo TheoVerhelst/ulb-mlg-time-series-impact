@@ -1,4 +1,7 @@
-on: [push]
+on:
+  schedule:
+    # run this workflow everyday at midnight
+    - cron:  '0 0 * * *'
 
 jobs:
   build:
