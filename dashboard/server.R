@@ -101,7 +101,7 @@ server <- function(input, output) {
   })
   
   output$italy_sliders <- renderUI({
-    if (input$italy_statistic %in% c("Confirmed","Deaths","Recovered")) {
+    if (input$italy_statistic %in% c("Confirmed", "Deaths", "Recovered")) {
       box(
         width = 150,
         sliderInput(
@@ -157,6 +157,10 @@ server <- function(input, output) {
   output$help_text_panel3  <- make_help()
   
   make_generic_plot <- function(data, country_name, region_name, date_range_name, stat_to_plot_name, log_scale_name, linear_fitting_name, smooth_growth_rate_name, is_growth_rate, is_italy_tab)  renderPlot({
+    # Do not show the growth rate plot if it is italy tab and not a relevant statistic
+    if (is_italy_tab & is_growth_rate & !req(input$italy_statistic) %in% c("Confirmed", "Deaths", "Recovered"))
+      return(NULL)
+    
     # the req function stops the rendering if the corresponding inputs are not yet available
     # this avoids an error early in the loading of the page, when the UI is loaded after
     # this portion of code.
