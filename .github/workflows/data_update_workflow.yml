@@ -1,7 +1,4 @@
-on:
-  schedule:
-    # run this workflow everyday at midnight
-    - cron:  '0 0 * * *'
+on: [push]
 
 jobs:
   build:
@@ -10,7 +7,7 @@ jobs:
     - name: Install R
       run: |
         sudo apt-get install r-base
-        Rscript -e "install.packages(c('plyr', 'reshape'))"
+        sudo Rscript -e "install.packages(c('plyr', 'reshape'))"
     - uses: actions/checkout@master
     - name: Create local changes
       run: |
