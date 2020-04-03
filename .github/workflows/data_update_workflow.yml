@@ -1,0 +1,26 @@
+on:
+  schedule:
+    # run this workflow everyday at midnight
+    - cron:  '0 0 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install R
+      run: |
+        sudo apt-get install r-base
+        Rscript -e "install.packages(c('plyr', 'reshape'))"
+    - uses: actions/checkout@master
+    - name: Create local changes
+      run: |
+          Rscript update_data.R
+    - name: Commit files
+      run: |
+        git config --local user.email "tverhels@ulb.ac.be"
+        git config --local user.name "Théo Verhelst"
+        git commit -am "Update data from sources"
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
