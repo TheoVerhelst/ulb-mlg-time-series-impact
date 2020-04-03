@@ -73,8 +73,8 @@ for (file in paste0("time_series_covid19_", c("confirmed", "deaths", "recovered"
 
 # Then Italy data
 download.file(
-  url = "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-regioni/dpc-covid19-ita-regioni-latest.csv",
-  destfile = "data/Italy/dpc-covid19-ita-regioni-latest.csv",
+  url = "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-regioni/dpc-covid19-ita-regioni.csv",
+  destfile = "data/Italy/dpc-covid19-ita-regioni.csv",
   mode = "wb")
 
 # We can't automate the download from Kaggle, since it requires authentication
@@ -119,7 +119,7 @@ global_merged.df <- merge(global_confirmed_vertical.df,
 # Italy data preprocessing
 ###############################
 # Load italy data
-italy.df <- read.csv("data/Italy/dpc-covid19-ita-regioni-latest.csv")
+italy.df <- read.csv("data/Italy/dpc-covid19-ita-regioni.csv")
 
 # Translate columns
 colnames(italy.df) <- c("Date","Country.Region","RegionCode","Province.State","Lat","Long","HospitalizedWSymptoms","ICU","TotalHospitalized","HomeIsolation","Confirmed","DailyConfirmed","Recovered","Deaths","Total","Tests")
