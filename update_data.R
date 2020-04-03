@@ -119,7 +119,7 @@ global_merged.df <- merge(global_confirmed_vertical.df,
 # Italy data preprocessing
 ###############################
 # Load italy data
-italy.df <- read.csv("data/Italy/dpc-covid19-ita-regioni.csv")
+italy.df <- read.csv("data/Italy/dpc-covid19-ita-regioni-latest.csv")
 
 # Translate columns
 colnames(italy.df) <- c("Date","Country.Region","RegionCode","Province.State","Lat","Long","HospitalizedWSymptoms","ICU","TotalHospitalized","HomeIsolation","Confirmed","DailyConfirmed","Recovered","Deaths","Total","Tests")
