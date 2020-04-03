@@ -25,7 +25,12 @@ world_side_panel <- sidebarPanel(
   
   checkboxInput("world_log_scale", "Use log scale for Y", FALSE),
   
-  radioButtons("world_policies", "Show a policy:", unlist(policy_label_dict_rev)),
+  radioButtons(
+    "world_policies",
+    label = "Show a policy:",
+    choices = unlist(policy_label_dict_rev),
+    selected = "Date.Stay at Home"
+  ),
   
   sliderInput(
     "world_smooth_growth_rate",

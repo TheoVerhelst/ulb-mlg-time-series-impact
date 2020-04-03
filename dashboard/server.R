@@ -65,7 +65,7 @@ server <- function(input, output) {
     selectInput(
       inputId = "world_country",
       label = "Choose a country:",
-      selected = countries[83,],
+      selected = "Italy",
       choices = countries
     )
   })
