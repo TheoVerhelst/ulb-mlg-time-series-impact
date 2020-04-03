@@ -29,9 +29,6 @@ The code of this dashboard is open-source and available on [GitHub](https://gith
 * Italy time series: [Presidenza del Consiglio dei Ministri - Dipartimento della Protezione Civile](https://github.com/pcm-dpc/COVID-19)
 * Country policy dates: [a Kaggle dataset](https://www.kaggle.com/koryto/countryinfo)
 
-## Vote our project! 
-Like and vote on [Devpost](https://devpost.com/software/ulb-mlg-time-series-impact)
-
 <br />
 <br />
 
