@@ -50,20 +50,20 @@ server <- function(input, output) {
   ##RENDERINGS##
   ##############
   
-  get_region <- reactive({
-    if (is.null(input$country))
+  get_world_region <- reactive({
+    if (is.null(input$world_country))
       return("")
-    else if (input$country %in% countries_with_regions)
-      return(input$region)
+    else if (input$world_country %in% countries_with_regions)
+      return(input$world_region)
     else
       return("")
   })
   
   # Create the country selector for the World tab
   # It is defined here because it depends on the dataset
-  output$country_selector <- renderUI({
+  output$world_country_selector <- renderUI({
     selectInput(
-      inputId = "country",
+      inputId = "world_country",
       label = "Choose a country:",
       selected = countries[83,],
       choices = countries
@@ -71,25 +71,25 @@ server <- function(input, output) {
   })
   
   ## Render the region selector if a country with regions is chosen
-  output$region_selector <- renderUI({
+  output$world_region_selector <- renderUI({
     # I can't get logical short circuit to work here
-    if (is.null(input$country))
+    if (is.null(input$world_country))
       return(NULL)
-    else if (!input$country %in% countries_with_regions)
+    else if (!input$world_country %in% countries_with_regions)
       return(NULL)
     else
       return(
       selectInput(
-          inputId = 'region',
+          inputId = 'world_region',
           label = 'Choose a region:',
-          choices = unique(global_data[global_data$Country.Region == input$country , "Province.State"])
+          choices = unique(global_data[global_data$Country.Region == input$world_country , "Province.State"])
         )
     )
   })
   
   # Create the region selector for the Italy tab
   # It is defined here because it depends on the dataset
-  output$italy_region_selection <- renderUI({
+  output$italy_region_selector <- renderUI({
     italian_regions <- unique(italian_data["Province.State"])
     selectInput(
       inputId = "italy_region",
@@ -101,11 +101,11 @@ server <- function(input, output) {
   })
   
   output$italy_sliders <- renderUI({
-    if (input$italy_statistic %in% c("Confirmed", "Deaths", "Recovered")) {
+    if (input$italy_stat %in% c("Confirmed", "Deaths", "Recovered")) {
       box(
         width = 150,
         sliderInput(
-          "smooth_growth_rate_italy",
+          "italy_smooth_growth_rate",
           label = "Degree of growth-rate smoothing:",
           min = 0,
           max = 10,
@@ -113,7 +113,7 @@ server <- function(input, output) {
         ),
         
         sliderInput(
-          "linear_fitting_italy",
+          "italy_linear_fitting",
           label = "Number of last days fitted",
           min = 5,
           max = 10,
@@ -125,27 +125,13 @@ server <- function(input, output) {
     }
   })
   
-  output$italy_growth <- renderUI({
-    if(input$italy_statistic %in% c("Confirmed","Deaths","Recovered")){
-      box(
-        title = "Growth_Rate",
-        width = NULL,
-        solidHeader = TRUE,
-        status = "primary",
-        plotOutput("italy_growth_plot")
-      )
-    } else {
-      return(NULL)
-    }
-  })
-  
   make_help <- function() renderUI({
-    relevant_row <- (info_data$Country.Region == input$country) &
-           (info_data$Province.State == get_region())
-    if(sum(relevant_row) == 0) {
-      HTML("<strong style='color:red'>Selected Date is not available for the specified country</strong>")
-    } else if (is.na(info_data[relevant_row, input$dates])) {
-      HTML("<strong style='color:red'>Selected Date is not available for the specified country</strong>")
+    relevant_row <- (info_data$Country.Region == input$world_country) &
+           (info_data$Province.State == get_world_region())
+    if (sum(relevant_row) == 0) {
+      HTML("<strong style='color:red'>Data for selected policy is not available</strong>")
+    } else if (is.na(info_data[relevant_row, input$world_policies])) {
+      HTML("<strong style='color:red'>Data for selected policy is not available</strong>")
     } else {
       return(NULL)
     }
@@ -156,16 +142,20 @@ server <- function(input, output) {
   output$help_text_panel2  <- make_help()
   output$help_text_panel3  <- make_help()
   
-  make_generic_plot <- function(data, country_name, region_name, date_range_name, stat_to_plot_name, log_scale_name, linear_fitting_name, smooth_growth_rate_name, is_growth_rate, is_italy_tab)  renderPlot({
+  make_generic_plot <- function(data, country_name, region_name,
+                                date_range_name, stat_to_plot_name,
+                                log_scale_name, linear_fitting_name,
+                                smooth_growth_rate_name,
+                                is_growth_rate, is_italy_tab) renderPlot({
     # Do not show the growth rate plot if it is italy tab and not a relevant statistic
-    if (is_italy_tab & is_growth_rate & !req(input$italy_statistic) %in% c("Confirmed", "Deaths", "Recovered"))
+    if (is_italy_tab & is_growth_rate & !req(input$italy_stat) %in% c("Confirmed", "Deaths", "Recovered"))
       return(NULL)
     
     # the req function stops the rendering if the corresponding inputs are not yet available
     # this avoids an error early in the loading of the page, when the UI is loaded after
     # this portion of code.
     country <- req(input[[country_name]])
-    region <- ifelse(is_italy_tab, req(input[[region_name]]), get_region())
+    region <- ifelse(is_italy_tab, req(input[[region_name]]), get_world_region())
     min_date <- Sys.Date() + input[[date_range_name]][1]
     max_date <- Sys.Date() + input[[date_range_name]][2]
     stat_to_plot <- paste0(input[[stat_to_plot_name]], ifelse(is_growth_rate, "GrowthRate", ""))
@@ -174,7 +164,7 @@ server <- function(input, output) {
                  (data$Date >= min_date) & (data$Date <= max_date),]
     
     country_info <- info_data[(info_data$Country.Region == country) & (info_data$Province.State == region),]
-    texts_to_show <- as.character(input$dates)
+    texts_to_show <- as.character(input$world_policies)
     dates_to_show <- do.call("c", lapply(texts_to_show, function(col) country_info[, col]))
     
     # Remove NAs to avoid a warning
@@ -199,14 +189,16 @@ server <- function(input, output) {
       # Perform smoothing
       data_smooth <- data[, c("Date", stat_to_plot)]
       data_smooth$smooth <- data_smooth[, stat_to_plot]
-      data_smooth[(is.nan(data_smooth[, stat_to_plot]))|(is.infinite(data_smooth[, stat_to_plot])), stat_to_plot] <- 0
-      data_smooth[(is.na(data_smooth[,"smooth"])) | (is.infinite(data_smooth[,"smooth"])), "smooth"] <- 0
+      data_smooth[is.nan(data_smooth[, stat_to_plot]) | is.infinite(data_smooth[, stat_to_plot]), stat_to_plot] <- 0
+      data_smooth[is.na(data_smooth[,"smooth"]) | is.infinite(data_smooth[,"smooth"]), "smooth"] <- 0
 
       w <- input[[smooth_growth_rate_name]]
-      if (w >= 1){
-        for (i in seq(1:nrow(data_smooth))){
-          if (i <= w) data_smooth[i,"smooth"] <- mean(data_smooth[0:i, stat_to_plot])
-          if (i > w) data_smooth[i,"smooth"] <- mean(data_smooth[(i-w):i, stat_to_plot])
+      if (w >= 1) {
+        for (i in 1:nrow(data_smooth)) {
+          if (i <= w)
+            data_smooth[i, "smooth"] <- mean(data_smooth[0:i, stat_to_plot])
+          if (i > w)
+            data_smooth[i, "smooth"] <- mean(data_smooth[(i - w):i, stat_to_plot])
           #if (i >= nrow(dataset)-(w/2)) dataset[i,"smooth"] <- mean(dataset[i-w:i, stat_to_plot])
         }
       }
@@ -248,32 +240,45 @@ server <- function(input, output) {
   ##PLOTS#
   ########  
   
-  output$cases_plot <- make_generic_plot(global_data, "country", "region", "range",
-                                         "world_stat", "log_scale_world",
-                                         "linear_fitting_world", "smooth_growth_rate_world",
+  output$world_cases_plot <- make_generic_plot(global_data, "world_country", "world_region", "world_date_range",
+                                         "world_stat", "world_log_scale",
+                                         "world_linear_fitting", "world_smooth_growth_rate",
                                          is_growth_rate = FALSE, is_italy_tab = FALSE)
-  output$growth_plot <- make_generic_plot(global_data, "country", "region", "range",
-                                          "world_stat", "log_scale_world",
-                                          "linear_fitting_world", "smooth_growth_rate_world",
+  output$world_growth_plot <- make_generic_plot(global_data, "world_country", "world_region", "world_date_range",
+                                          "world_stat", "world_log_scale",
+                                          "world_linear_fitting", "world_smooth_growth_rate",
                                           is_growth_rate = TRUE, is_italy_tab = FALSE)
-  output$chosen_stat_it_plot <- make_generic_plot(italian_data, "italy_country", "italy_region", "italy_range",
-                                                "italy_statistic", "log_scale_world_IT",
-                                                "linear_fitting_italy", "smooth_growth_rate_italy",
+  output$italy_cases_plot <- make_generic_plot(italian_data, "italy_country", "italy_region", "italy_range",
+                                                "italy_stat", "italy_log_scale",
+                                                "italy_linear_fitting", "italy_smooth_growth_rate",
                                                 is_growth_rate = FALSE, is_italy_tab = TRUE)
   output$italy_growth_plot <- make_generic_plot(italian_data, "italy_country", "italy_region", "italy_range",
-                                                "italy_statistic", "log_scale_world_IT",
-                                                "linear_fitting_italy", "smooth_growth_rate_italy",
+                                                "italy_stat", "italy_log_scale",
+                                                "italy_linear_fitting", "italy_smooth_growth_rate",
                                                 is_growth_rate = TRUE, is_italy_tab = TRUE)
+  output$italy_growth_plot_cond <- renderUI({
+    if(input$italy_stat %in% c("Confirmed","Deaths","Recovered")){
+      box(
+        title = "Growth rate",
+        width = NULL,
+        solidHeader = TRUE,
+        status = "primary",
+        plotOutput("italy_growth_plot")
+      )
+    } else {
+      return(NULL)
+    }
+  })
   
-  output$action_comp_plot <- renderPlot({
-    min_date = Sys.Date() + input$range[1]
-    max_date = Sys.Date() + input$range[2]
+  output$policy_comp_plot <- renderPlot({
+    min_date = Sys.Date() + input$world_date_range[1]
+    max_date = Sys.Date() + input$world_date_range[2]
     
-    dataset <- global_data_by_action[(global_data_by_action$Country.Region == input$country) &
-                           (global_data_by_action$Province.State == get_region()) &
+    dataset <- global_data_by_action[(global_data_by_action$Country.Region == input$world_country) &
+                           (global_data_by_action$Province.State == get_world_region()) &
                            (global_data_by_action$Date >= min_date) &
                            (global_data_by_action$Date <= max_date),]
-    dataset <- dataset[dataset$Action == as.character(input$dates),]
+    dataset <- dataset[dataset$Action == as.character(input$world_policies),]
     stat_to_plot <- paste0(input$world_stat, "GrowthRate")
     ggplot(dataset, aes_string(x = "BeforeAction", color="BeforeAction", y = stat_to_plot)) + 
       geom_boxplot(show.legend = FALSE) +
@@ -290,20 +295,20 @@ server <- function(input, output) {
     # Select the right statistic
     to_plot.ts <- time_series_by_stat[paste0(input$world_stat, "GrowthRate")][[1]]
     # Select the right country
-    country_pair <- paste0(input$country, "_", get_region())
+    country_pair <- paste0(input$world_country, "_", get_world_region())
     to_plot.ts <- to_plot.ts[,country_pair]
     # Select the right date range
-    min_date = Sys.Date() + input$range[1]
-    max_date = Sys.Date() + input$range[2]
+    min_date = Sys.Date() + input$world_date_range[1]
+    max_date = Sys.Date() + input$world_date_range[2]
     to_plot.ts <- to_plot.ts[(index(to_plot.ts) >= min_date) & (index(to_plot.ts) <= max_date)]
     to_plot.ts <- to_plot.ts[!is.na(to_plot.ts)]
     to_plot.ts <- to_plot.ts[is.finite(to_plot.ts)]
     to_plot.df <- data.frame(Date = index(to_plot.ts), Value = coredata(to_plot.ts))
     
     # Show lines with important dates
-    country_info <- info_data[(info_data$Country.Region == input$country) &
-                              (info_data$Province.State == get_region()),]
-    texts_to_show <- as.character(input$dates)
+    country_info <- info_data[(info_data$Country.Region == input$world_country) &
+                              (info_data$Province.State == get_world_region()),]
+    texts_to_show <- as.character(input$world_policies)
     dates_to_show <- do.call("c", lapply(texts_to_show, function(col) country_info[, col]))
     # Remove NAs to avoid a warning
     texts_to_show <- texts_to_show[!is.na(dates_to_show)]
@@ -350,8 +355,8 @@ server <- function(input, output) {
                                 colnames(to_plot.ts))
     to_plot.ts <- to_plot.ts[,selected_countries]
     # Select the right date range
-    min_date = Sys.Date() + input$range[1]
-    max_date = Sys.Date() + input$range[2]
+    min_date = Sys.Date() + input$world_date_range[1]
+    max_date = Sys.Date() + input$world_date_range[2]
     to_plot.ts <- to_plot.ts[(index(to_plot.ts) >= min_date) & (index(to_plot.ts) <= max_date)]
     # to_plot.ts <- to_plot.ts[!is.na(to_plot.ts)]
     # to_plot.ts <- to_plot.ts[is.finite(to_plot.ts)]
@@ -388,7 +393,7 @@ server <- function(input, output) {
   output$ranking_plot <- renderPlot({
     # ConfirmedGrowthRate is hardcoded because we have barely any data for the others
     t_stat <- compute_t_statistic(global_data_by_action[global_data_by_action$Province.State == "",], "ConfirmedGrowthRate")
-    t_stat <- t_stat[t_stat$Action == input$ranking_date,]
+    t_stat <- t_stat[t_stat$Action == input$ranking_policy,]
     t_stat <- t_stat[!is.na(t_stat$t.value),]
     ggplot(t_stat, aes(x = reorder(Country.Region, t.value, sum), y = t.value)) +
       geom_col(fill = "lightblue") +

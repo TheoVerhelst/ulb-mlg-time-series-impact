@@ -5,8 +5,8 @@ library(waiter)
 source("common.R")
 
 world_side_panel <- sidebarPanel(
-  uiOutput("country_selector"),
-  uiOutput("region_selector"),
+  uiOutput("world_country_selector"),
+  uiOutput("world_region_selector"),
   
   selectInput(
     inputId = "world_stat",
@@ -16,19 +16,19 @@ world_side_panel <- sidebarPanel(
   ),
   
   sliderInput(
-    "range",
+    "world_date_range",
     label = "Days of interest (0 = last day):",
     min = -60,
     max = 0,
     value = c(-40, 0)
   ),
   
-  checkboxInput("log_scale_world", "Use log scale for Y", FALSE),
+  checkboxInput("world_log_scale", "Use log scale for Y", FALSE),
   
-  radioButtons("dates", "Show a special date:", unlist(action_label_dict_rev)),
+  radioButtons("world_policies", "Show a policy:", unlist(action_label_dict_rev)),
   
   sliderInput(
-    "smooth_growth_rate_world",
+    "world_smooth_growth_rate",
     label = "Degree of growth-rate smoothing:",
     min = 0,
     max = 10,
@@ -36,7 +36,7 @@ world_side_panel <- sidebarPanel(
   ),
   
   sliderInput(
-    "linear_fitting_world",
+    "world_linear_fitting",
     label = "Number of last days fitted",
     min = 5,
     max = 10,
@@ -69,18 +69,18 @@ world_main_panel <- mainPanel(
          width = 12,
 		 uiOutput("help_text_panel1"),
          box(
-           title = "Total cases",
+           title = "Time evolution",
            width = NULL,
            solidHeader = TRUE,
            status = "primary",
-           plotOutput("cases_plot")
+           plotOutput("world_cases_plot")
          ),
          box(
            title = "Growth Rate",
            width = NULL,
            solidHeader = TRUE,
            status = "primary",
-           plotOutput("growth_plot")
+           plotOutput("world_growth_plot")
          )
        )
     ),
@@ -94,7 +94,7 @@ world_main_panel <- mainPanel(
            width = NULL,
            solidHeader = TRUE,
            status = "primary",
-           plotOutput("action_comp_plot")
+           plotOutput("policy_comp_plot")
          )
        )
     ),
@@ -146,10 +146,10 @@ italy_side_panel <- sidebarPanel(
       value = "Italy"
     )
   ),
-  uiOutput("italy_region_selection"),
+  uiOutput("italy_region_selector"),
   
   selectInput(
-    inputId = "italy_statistic",
+    inputId = "italy_stat",
     label = "Choose a statistic:",
     choices = stat_italy_label_dict,
     selected = stat_italy_label_dict[0]
@@ -162,7 +162,7 @@ italy_side_panel <- sidebarPanel(
     max = 0,
     value = c(-40, 0)
   ),
-  checkboxInput("log_scale_world_IT", "Use log scale for Y", FALSE),
+  checkboxInput("italy_log_scale", "Use log scale for Y", FALSE),
   
   
   uiOutput("italy_sliders")
@@ -172,22 +172,22 @@ italy_side_panel <- sidebarPanel(
 italy_main_panel <- mainPanel(column(
   width = 10,
   box(
-    title = "Statistics",
+    title = "Time evolution",
     width = NULL,
     solidHeader = TRUE,
     status = "primary",
-    plotOutput("chosen_stat_it_plot")
+    plotOutput("italy_cases_plot")
   ),
-  uiOutput("italy_growth")
+  uiOutput("italy_growth_plot_cond")
 ))
 
 
 ranking_side_panel <- sidebarPanel(
-  radioButtons("ranking_date", "Confinement action used in ranking", unlist(action_label_dict_rev)),
+  radioButtons("ranking_policy", "Confinement policy used in ranking", unlist(action_label_dict_rev)),
   helpText(
     "In this section, a t-test is performed to assess the difference between the
     distribution of the growth rate of confirmed cases, before and after
-    an action is taken. We report here the resulting statistic,
+    a policy is applied. We report here the resulting statistic,
     the one-sided p-value and the difference (delta) between the means.
     The p-values are adjusted using Holm's method."
   )
