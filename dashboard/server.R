@@ -51,9 +51,9 @@ server <- function(input, output) {
   ##############
   
   get_world_region <- reactive({
-    if (is.null(input$world_country))
-      return("")
-    else if (input$world_country %in% countries_with_regions)
+    # Short-circuit evaluation with operator &&
+    # The left-hand parti is evaluated only if the world_country is not NA
+    if (!is.null(input$world_country) && input$world_country %in% countries_with_regions)
       return(input$world_region)
     else
       return("")
@@ -125,22 +125,18 @@ server <- function(input, output) {
     }
   })
   
-  make_help <- function() renderUI({
+  ## Render the help text panel 1 if a date with NA is chosen
+  output$policy_help_text <- renderUI({
     relevant_row <- (info_data$Country.Region == input$world_country) &
-           (info_data$Province.State == get_world_region())
-    if (sum(relevant_row) == 0) {
-      HTML("<strong style='color:red'>Data for selected policy is not available</strong>")
-    } else if (is.na(info_data[relevant_row, input$world_policies])) {
-      HTML("<strong style='color:red'>Data for selected policy is not available</strong>")
+                    (info_data$Province.State == get_world_region())
+    # Short circuit evaluation with ||
+    # right-hand part is evaluated only if sum(relevant_row) > 0
+    if (sum(relevant_row) == 0 || is.na(info_data[relevant_row, input$world_policies])) {
+      strong("Data for selected policy is not available", style = "color:red")
     } else {
       return(NULL)
     }
   })
-  
-  ## Render the help text panel 1 if a date with NA is chosen
-  output$help_text_panel1 <- make_help()
-  output$help_text_panel2  <- make_help()
-  output$help_text_panel3  <- make_help()
   
   make_generic_plot <- function(data, country_name, region_name,
                                 date_range_name, stat_to_plot_name,

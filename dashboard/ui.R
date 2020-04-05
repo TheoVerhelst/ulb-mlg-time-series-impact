@@ -25,6 +25,7 @@ world_side_panel <- sidebarPanel(
   
   checkboxInput("world_log_scale", "Use log scale for Y", FALSE),
   
+  uiOutput("policy_help_text"),
   radioButtons(
     "world_policies",
     label = "Show a policy:",
@@ -70,71 +71,67 @@ world_side_panel <- sidebarPanel(
 world_main_panel <- mainPanel(
   tabsetPanel(
     tabPanel("Time evolution",
-       column(
-         width = 12,
-		 uiOutput("help_text_panel1"),
-         box(
-           title = "Time evolution",
-           width = NULL,
-           solidHeader = TRUE,
-           status = "primary",
-           plotOutput("world_cases_plot")
-         ),
-         box(
-           title = "Growth Rate",
-           width = NULL,
-           solidHeader = TRUE,
-           status = "primary",
-           plotOutput("world_growth_plot")
-         )
-       )
+      column(
+        width = 12,
+        box(
+          title = "Time evolution",
+          width = NULL,
+          solidHeader = TRUE,
+          status = "primary",
+          plotOutput("world_cases_plot")
+        ),
+        box(
+          title = "Growth Rate",
+          width = NULL,
+          solidHeader = TRUE,
+          status = "primary",
+          plotOutput("world_growth_plot")
+        )
+      )
     ),
     
     tabPanel("Distribution comparison",
-       column(
-         width = 12,
-		 uiOutput("help_text_panel2"),
-         box(
-           title = "Distribution of growth rate before and after action",
-           width = NULL,
-           solidHeader = TRUE,
-           status = "primary",
-           plotOutput("policy_comp_plot")
-         )
-       )
+      column(
+        width = 12,
+        box(
+          title = "Distribution of growth rate before and after action",
+          width = NULL,
+          solidHeader = TRUE,
+          status = "primary",
+          plotOutput("policy_comp_plot")
+        )
+      )
     ),
     
     tabPanel("Change point detection",
-       column(
-         width = 12,
-         uiOutput("help_text_panel3"),
-         box(
-           title = "Detection of change point",
-           width = NULL,
-           solidHeader = TRUE,
-           status = "primary",
-           plotOutput("change_point_plot")
-         ),
-         wellPanel(
-           helpText("We employ an algorithm (based on the R package changepoints) to detect a shift in the distribution of the data.
+      column(
+        width = 12,
+        box(
+          title = "Detection of change point",
+          width = NULL,
+          solidHeader = TRUE,
+          status = "primary",
+          plotOutput("change_point_plot")
+        ),
+        wellPanel(
+          helpText("We employ an algorithm (based on the R package changepoints) to detect a shift in the distribution of the data.
                     The algorithm assumes a prior normal distribution of the data, and finds the optimal number of change points
                     (in terms of mean and variance), based on a binary segmentation algorithm (Scott and Knott (1974)).")
-         )
-       )
+        )
+      )
     ),
     
     tabPanel("Time series clustering",
-             column(
-               width = 12,
-               uiOutput("help_text_panel4"),
-               box(
-                 title = "Time series clustering",
-                 width = NULL,
-                 solidHeader = TRUE,
-                 status = "primary",
-                 plotOutput("ts_cluster_plot", width = "100%")
-               )
-             )
+      column(
+        width = 12,
+        box(
+          title = "Time series clustering",
+          width = NULL,
+          solidHeader = TRUE,
+          status = "primary",
+          plotOutput("ts_cluster_plot", width = "100%")
+        )
+      )
     )
   )
 )

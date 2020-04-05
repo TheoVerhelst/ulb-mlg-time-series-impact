@@ -1,4 +1,6 @@
 ---
+title: "About"
+author: "Théo Verhelst"
 output:
   html_document: default
 ---
