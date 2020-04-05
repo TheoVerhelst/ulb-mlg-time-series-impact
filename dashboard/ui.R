@@ -1,6 +1,7 @@
 library(shiny)
 library(shinydashboard)
 library(waiter)
+library(shinyjs)
 
 source("common.R")
 
