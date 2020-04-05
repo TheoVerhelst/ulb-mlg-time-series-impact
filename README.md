@@ -3,6 +3,9 @@
 
 This dashboard is the participation of the Machine Learning Group from the Université Libre de Bruxelles (MLG-ULB, [mlg.ulb.ac.be](http://mlg.ulb.ac.be)) to the hackaton CodeVsCovid19 ([www.codevscovid19.org](http://www.codevscovid19.org)). It provides a detailed analysis of the effect of government policies on the evolution of the COVID-19 disease.
 
+## Live demo
+[gbonte.shinyapps.io/Shiny_App_Covid/](https://gbonte.shinyapps.io/Shiny_App_Covid/)
+
 ## The Team
 
 * Théo Verhelst (tverhels@ulb.ac.be): Team lead

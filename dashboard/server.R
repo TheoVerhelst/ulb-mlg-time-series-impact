@@ -3,6 +3,7 @@ library(dplyr)
 library(shiny)
 library(shinydashboard)
 library(ggplot2)
+library(ggrepel)
 library(zoo)
 library(imputeTS)
 library(scales)
@@ -167,17 +168,25 @@ server <- function(input, output) {
     texts_to_show <- texts_to_show[!is.na(dates_to_show)]
     dates_to_show <- dates_to_show[!is.na(dates_to_show)]
     
-    dates_to_show_lab <- format(dates_to_show, date_format)
-    events <- unlist(policy_label_dict[texts_to_show])
-    days <- unlist(dates_to_show_lab)
+    text_to_show_label <- unlist(policy_label_dict[texts_to_show])
+    dates_to_show_label <- unlist(format(dates_to_show, date_format))
+    
+    policy_annotation.df <- data.frame(
+      label =  paste(text_to_show_label, dates_to_show_label, sep = ": "),
+      x = dates_to_show,
+      y = array(Inf, dim = length(dates_to_show))) # Put the date label to the top of the plot
     
     p <- ggplot(data, aes_string(x = "Date", y = stat_to_plot)) +
       geom_line() +
       geom_vline(xintercept = dates_to_show) +
       xlab("Date") +
       ylab(stat_to_plot) +
-      annotate("text", x = dates_to_show, y = 0, angle = 90, vjust = 1.5, hjust=-0.5, label =  paste(events, days, sep = ": ")) + 
-      scale_y_continuous(trans=ifelse(input[[log_scale_name]] && !is_growth_rate, "log10", "identity")) +
+      # use ggrepel to avoid clipping the limits of the plot
+      geom_text_repel(data = policy_annotation.df,
+                aes(x = x, y = y, label = label),
+                angle = 90, hjust = -0.5,
+                direction = "y") +
+      scale_y_continuous(trans = ifelse(input[[log_scale_name]] && !is_growth_rate, "log10", "identity")) +
       theme_bw()
     
     
@@ -222,11 +231,17 @@ server <- function(input, output) {
           root_text <- "growth rate increases"
         }
         
+        annotation.df <- data.frame(
+          label = paste("p =", format(date_p_val, digits = 2), "\n", root_text),
+          x = predicted[1, "Date"],
+          y = predicted[1, "predicted"]
+        )
         p <- p +
           geom_line(data = predicted, aes(x = Date, y = predicted), color = "red", size = 1.5) +
-          annotate("text",
-                   x = predicted[1, "Date"], y = predicted[1, "predicted"], vjust = -1.5, hjust = 0,
-                   label =  paste("p =", format(date_p_val, digits = 2), "\n", root_text))
+          # use ggrepel to avoid clipping the limits of the plot
+          geom_text_repel(
+            data = annotation.df, aes(x = x, y = y, label = label),
+            direction = "y", nudge_y = 0.1, segment.size = 0)
       }
     }
     p
@@ -253,7 +268,7 @@ server <- function(input, output) {
                                                 "italy_linear_fitting", "italy_smooth_growth_rate",
                                                 is_growth_rate = TRUE, is_italy_tab = TRUE)
   output$italy_growth_plot_cond <- renderUI({
-    if(input$italy_stat %in% c("Confirmed","Deaths","Recovered")){
+    if (input$italy_stat %in% c("Confirmed","Deaths","Recovered")){
       box(
         title = "Growth rate",
         width = NULL,
@@ -276,22 +291,25 @@ server <- function(input, output) {
                            (global_data_by_action$Date <= max_date),]
     dataset <- dataset[dataset$Action == as.character(input$world_policies),]
     stat_to_plot <- paste0(input$world_stat, "GrowthRate")
-    ggplot(dataset, aes_string(x = "BeforeAction", color="BeforeAction", y = stat_to_plot)) + 
+    ggplot(dataset, aes_string(x = "BeforeAction", color = "BeforeAction", y = stat_to_plot)) + 
       geom_boxplot(show.legend = FALSE) +
       scale_color_brewer(type = "qual", palette = 2) +
       xlab("Comparison before and after the action") +
-      ylab("Growth Rate distribution")+
-      scale_x_discrete(labels=c("Before the action", "After the action"), limits = c(T, F)) +
+      ylab("Growth Rate distribution") +
+      scale_x_discrete(labels = c("Before the action", "After the action"), limits = c(T, F)) +
       theme_bw()
   })
   
   
   
   output$change_point_plot <- renderPlot({
+    country <- req(input$world_country)
+    region <- get_world_region()
+    
     # Select the right statistic
     to_plot.ts <- time_series_by_stat[paste0(input$world_stat, "GrowthRate")][[1]]
     # Select the right country
-    country_pair <- paste0(input$world_country, "_", get_world_region())
+    country_pair <- paste0(country, "_", region)
     to_plot.ts <- to_plot.ts[,country_pair]
     # Select the right date range
     min_date = Sys.Date() + input$world_date_range[1]
@@ -302,26 +320,38 @@ server <- function(input, output) {
     to_plot.df <- data.frame(Date = index(to_plot.ts), Value = coredata(to_plot.ts))
     
     # Show lines with important dates
-    country_info <- info_data[(info_data$Country.Region == input$world_country) &
-                              (info_data$Province.State == get_world_region()),]
+    country_info <- info_data[(info_data$Country.Region == country) & (info_data$Province.State == region),]
     texts_to_show <- as.character(input$world_policies)
     dates_to_show <- do.call("c", lapply(texts_to_show, function(col) country_info[, col]))
+    
     # Remove NAs to avoid a warning
     texts_to_show <- texts_to_show[!is.na(dates_to_show)]
     dates_to_show <- dates_to_show[!is.na(dates_to_show)]
+    
+    text_to_show_label <- unlist(policy_label_dict[texts_to_show])
+    dates_to_show_label <- unlist(format(dates_to_show, date_format))
+    
+    policy_annotation.df <- data.frame(
+      label =  paste(text_to_show_label, dates_to_show_label, sep = ": "),
+      x = dates_to_show,
+      y = array(Inf, dim = length(dates_to_show))) # Put the date label to the top of the plot
     
     p <- ggplot(to_plot.df, aes(x = Date, y = Value)) +
       geom_line() +
       geom_vline(xintercept = dates_to_show) +
       xlab("Date") +
       ylab(paste(input$world_stat, "growth rate")) +
-      annotate("text", x = dates_to_show, y = 0, angle = 90, vjust = 1.5, hjust=-1.5, label = unlist(policy_label_dict[texts_to_show])) +
+      # use ggrepel to avoid clipping the limits of the plot
+      geom_text_repel(data = policy_annotation.df,
+                aes(x = x, y = y, label = label),
+                angle = 90, hjust = -0.5,
+                direction = "y") +
       theme_bw()
     
     # Compute change point detection
     Q <- 10
     if (length(to_plot.ts) > Q) {
-      to_plot.cpt <- cpt.meanvar(to_plot.ts, test.stat='Normal', method='BinSeg', Q=Q, penalty="SIC")
+      to_plot.cpt <- cpt.meanvar(to_plot.ts, test.stat= 'Normal', method = 'BinSeg', Q = Q, penalty="SIC")
       changepoints <- cpts(to_plot.cpt)
       # Plot them if there is any change point at all
       if (length(changepoints) > 0) {
@@ -330,14 +360,14 @@ server <- function(input, output) {
         means_cp <- c(means_cp, mean(to_plot.ts[tail(changepoints, 1):length(to_plot.ts)]))
         endpoint_cp_date <- c(index(to_plot.ts)[changepoints], tail(index(to_plot.ts), 1))
         segments.df <- data.frame(
-            x=c(index(to_plot.ts)[1], endpoint_cp_date[1:length(endpoint_cp_date) - 1]),
-            xend=endpoint_cp_date,
-            y=means_cp,
-            yend=means_cp)
+            x = c(index(to_plot.ts)[1], endpoint_cp_date[1:length(endpoint_cp_date) - 1]),
+            xend = endpoint_cp_date,
+            y = means_cp,
+            yend = means_cp)
         
         p <- p  + geom_segment(data = segments.df,
            aes(x = x, xend = xend, y = y, yend = yend),
-           color="blue")
+           color = "blue")
       }
     }
     p
@@ -377,8 +407,8 @@ server <- function(input, output) {
       facet_grid(Cluster ~ ., labeller=label_both) +
       scale_x_date(labels = date_format("%m/%d"),
                    breaks=date_breaks("days")) +
-      labs(y=paste(input$world_stat, "Growth Rate"),
-           x="Time",title="European Countries") +
+      labs(y = paste(input$world_stat, "Growth Rate"),
+           x = "Time", title = "European Countries") +
       theme_bw() +
       theme(legend.position = 'bottom',
             axis.text.x = element_text(angle=45))
@@ -393,7 +423,10 @@ server <- function(input, output) {
     t_stat <- t_stat[!is.na(t_stat$t.value),]
     ggplot(t_stat, aes(x = reorder(Country.Region, t.value, sum), y = t.value)) +
       geom_col(fill = "lightblue") +
-      geom_text(aes(label = paste("p =", prettyNum(p.value.adj), ", delta =", format(delta, digits = 2))), position = position_stack(vjust = .5)) +
+      # use ggrepel to avoid clipping the limits of the plot
+      geom_text_repel(aes(
+        label = paste("p =", prettyNum(p.value.adj), ", delta =", format(delta, digits = 2))),
+        point.padding = NA) +
       coord_flip() +
       xlab("Country") +
       ylab("T-test statistic (with adjusted p-value and mean difference)") +
