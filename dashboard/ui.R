@@ -218,6 +218,7 @@ dashboardPage(
   )),
   
   dashboardBody(fluidPage(
+    useShinyjs(),
     # Add a loading screen
     use_waiter(include_js = FALSE),
     tabItems(

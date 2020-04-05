@@ -11,6 +11,7 @@ library(TSclust)
 library(changepoint)
 library(changepoint.np)
 library(waiter)
+library(shinyjs)
 
 source("functions.R")
 source("common.R")
@@ -130,6 +131,24 @@ server <- function(input, output) {
   output$policy_help_text <- renderUI({
     relevant_row <- (info_data$Country.Region == input$world_country) &
                     (info_data$Province.State == get_world_region())
+    
+    for (policy in names(policy_label_dict)) {
+      selector_string <- paste0("input[type='radio'][name='world_policies'][value='", policy, "']")
+      if (sum(relevant_row) > 0 && !is.na(info_data[relevant_row, policy])) {
+        shinyjs::enable(selector = selector_string)
+        shinyjs::runjs(paste0(
+          "$(\"", selector_string, "\").parent().parent()",
+          ".addClass('enabled').removeClass('disabled')",
+          ".css('opacity', 1.0)"))
+      } else {
+        shinyjs::disable(selector = selector_string)
+        shinyjs::runjs(paste0(
+          "$(\"", selector_string, "\").parent().parent()",
+          ".addClass('disable').removeClass('enabled')",
+          ".css('opacity', 0.4)"))
+      }
+    }
+      
     # Short circuit evaluation with ||
     # right-hand part is evaluated only if sum(relevant_row) > 0
     if (sum(relevant_row) == 0 || is.na(info_data[relevant_row, input$world_policies])) {
