@@ -17,8 +17,8 @@ jobs:
           Rscript update_data.R
     - name: Commit files
       run: |
-        git config --local user.email "tverhels@ulb.ac.be"
-        git config --local user.name "Théo Verhelst"
+        git config --local user.email "data.bot@email.com"
+        git config --local user.name "Data Bot"
         git commit -am "Update data from sources"
     - name: Push changes
       uses: ad-m/github-push-action@master
