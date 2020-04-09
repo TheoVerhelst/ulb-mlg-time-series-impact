@@ -210,6 +210,12 @@ server <- function(input, output) {
     
     
     if (is_growth_rate) {
+      # Do not display extreme values on the growth rate plot
+      quartiles <- quantile(data[,stat_to_plot], na.rm = TRUE)
+      upper_limit <- quartiles[4] + 3 * (quartiles[4] - quartiles[1])
+      highest_non_outlier <- max(data[data[,stat_to_plot] <= upper_limit, stat_to_plot])
+      p <- p + coord_cartesian(ylim = c(0, highest_non_outlier))
+      
       # Perform smoothing
       data_smooth <- data[, c("Date", stat_to_plot)]
       data_smooth$smooth <- data_smooth[, stat_to_plot]
